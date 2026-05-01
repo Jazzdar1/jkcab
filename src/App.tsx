@@ -304,7 +304,8 @@ function AppContent() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/vehicle/:id" element={<VehicleDetailsPage onBook={handleVehicleSelect} />} />
-        </Routes>
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
       </main>
       <Footer />
       <WhatsAppButton />
