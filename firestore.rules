@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        request.auth.token.email == 'darajazb@gmail.com'
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Users Collection ---
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      
+      function isValidUser(data) {
+        return data.keys().hasAll(['email', 'role', 'createdAt', 'updatedAt']) &&
+               data.keys().size() == 4 &&
+               data.email is string && data.email.size() <= 200 &&
+               data.role in ['customer', 'admin'] &&
+               data.createdAt == request.time &&
+               data.updatedAt == request.time;
+      }
+
+      allow create: if isValidId(userId) && isOwner(userId) && isValidUser(incoming()) && incoming().role == 'customer';
+      allow update: if isValidId(userId) && (isOwner(userId) || isAdmin()) && (
+        // Action: Update profile (Non-admins can't change role)
+        (isOwner(userId) && !isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'updatedAt']) && incoming().updatedAt == request.time) ||
+        // Action: Admin Full Update
+        (isAdmin() && incoming().updatedAt == request.time)
+      );
+    }
+
+    // --- Bookings Collection ---
+    match /bookings/{bookingId} {
+      allow get: if isValidId(bookingId) && ((resource.data.userId == 'guest') || (isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin())));
+      allow list: if (isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin()));
+
+      function isValidBooking(data) {
+        return data.keys().hasAll(['userId', 'customerName', 'customerPhone', 'customerEmail', 'pickup', 'dropoff', 'date', 'passengers', 'vehicle', 'features', 'status', 'contactPreferences', 'createdAt', 'updatedAt']) &&
+               data.keys().size() == 14 &&
+               data.userId is string && data.userId.size() <= 128 &&
+               data.customerName is string && data.customerName.size() >= 2 && data.customerName.size() <= 100 &&
+               data.customerPhone is string && data.customerPhone.size() >= 10 && data.customerPhone.size() <= 20 &&
+               data.customerEmail is string && data.customerEmail.size() <= 100 &&
+               data.pickup is string && data.pickup.size() >= 2 && data.pickup.size() <= 200 &&
+               data.dropoff is string && data.dropoff.size() >= 2 && data.dropoff.size() <= 200 &&
+               data.date is string && data.date.size() <= 50 &&
+               data.passengers is int && data.passengers > 0 && data.passengers <= 50 &&
+               data.vehicle is string && data.vehicle.size() <= 100 &&
+               data.features is list && data.features.size() <= 10 &&
+               data.status in ['pending', 'confirmed', 'cancelled'] &&
+               data.contactPreferences is map &&
+               data.contactPreferences.keys().hasAll(['whatsapp', 'email']) &&
+               data.contactPreferences.keys().size() == 2 &&
+               data.contactPreferences.whatsapp is bool &&
+               data.contactPreferences.email is bool &&
+               data.createdAt == request.time &&
+               data.updatedAt == request.time;
+      }
+
+      allow create: if isValidId(bookingId) && isValidBooking(incoming()) && (
+        (isSignedIn() && incoming().userId == request.auth.uid) || 
+        (!isSignedIn() && incoming().userId == 'guest')
+      ) && incoming().status == 'pending';
+
+      allow update: if isValidId(bookingId) && (isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin())) && (
+        // Action: User Update (Can only update if still pending)
+        (resource.data.userId == request.auth.uid && existing().status == 'pending' && 
+         incoming().diff(existing()).affectedKeys().hasOnly(['customerName', 'customerPhone', 'customerEmail', 'pickup', 'dropoff', 'date', 'passengers', 'vehicle', 'features', 'contactPreferences', 'updatedAt']) && 
+         incoming().updatedAt == request.time) ||
+        // Action: Admin Status Update
+        (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) && incoming().updatedAt == request.time)
+      );
+      
+      allow delete: if isValidId(bookingId) && isAdmin();
+    }
+  }
+}
