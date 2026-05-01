@@ -292,7 +292,9 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                         onChange={(e) => setFormData({...formData, passengers: e.target.value})}
                       >
                         {[1, 2, 3, 4, 5, 6, 7, 8, '8+'].map((num) => (
-                          <option key={num} value={num} className="text-black bg-white">{num} Passengers</option>
+                          <option key={num} value={num} className="text-gray-900 bg-white">
+                            {num} Passengers
+                          </option>
                         ))}
                       </select>
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within/input:text-yellow-500">
@@ -338,7 +340,9 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                             onChange={(e) => setFormData({...formData, vehicles: [e.target.value]})}
                           >
                             {VEHICLES.map((v) => (
-                              <option key={v.id} value={v.name}>{v.name}</option>
+                              <option key={v.id} value={v.name} className="text-gray-900 bg-white">
+                                {v.name}
+                              </option>
                             ))}
                           </select>
                           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within/input:text-yellow-500">

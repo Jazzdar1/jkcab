@@ -1,13 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Toaster } from '@/components/ui/sonner';
-import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -494,11 +484,11 @@ export default function AdminPanel() {
                           </div>
                           <div className="space-y-2">
                              <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Classification</label>
-                             <select name="type" defaultValue={editingItem?.type} className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-0 font-bold px-4 text-sm appearance-none">
-                               <option value="Sedan">Executive Sedan</option>
-                               <option value="SUV">Luxury SUV</option>
-                               <option value="Luxury">Premium Elite</option>
-                               <option value="Large Group">Group Carrier</option>
+                             <select name="type" defaultValue={editingItem?.type} className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-0 font-bold px-4 text-sm appearance-none text-gray-900 dark:text-white">
+                               <option value="Sedan" className="text-gray-900 bg-white">Executive Sedan</option>
+                               <option value="SUV" className="text-gray-900 bg-white">Luxury SUV</option>
+                               <option value="Luxury" className="text-gray-900 bg-white">Premium Elite</option>
+                               <option value="Large Group" className="text-gray-900 bg-white">Group Carrier</option>
                              </select>
                           </div>
                           <div className="space-y-2">
