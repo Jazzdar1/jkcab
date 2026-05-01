@@ -29,22 +29,21 @@ export default function TravelGuide() {
   const [openIndex, setOpenIndex] = React.useState<number | null>(0);
 
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-16">
+    <section className="py-20 bg-[var(--color-hotstar-bg)]">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <HelpCircle className="h-10 w-10 text-yellow-400 mx-auto mb-4" />
-            <h2 className="text-sm font-bold text-yellow-600 uppercase tracking-[0.2em] mb-4">Travel Guide</h2>
-            <h3 className="text-4xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h3>
-            <div className="w-24 h-1 bg-yellow-400 mx-auto rounded-full"></div>
+            <HelpCircle className="h-8 w-8 text-yellow-400 mx-auto mb-4" />
+            <h2 className="text-[10px] font-black text-yellow-400 uppercase tracking-[0.3em] mb-4">Travel Guide</h2>
+            <h3 className="text-4xl font-black text-white mb-6 uppercase tracking-tight">Kashmir FAQs</h3>
           </motion.div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, index) => (
             <motion.div 
               key={index}
@@ -52,23 +51,23 @@ export default function TravelGuide() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.05 }}
-              className="border border-gray-100 rounded-3xl overflow-hidden"
+              className="border border-white/5 bg-[#101c2b]/50 rounded-2xl overflow-hidden shadow-xl"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors"
               >
-                <span className="text-lg font-bold text-gray-800">{faq.q}</span>
+                <span className="text-sm font-black text-white uppercase tracking-tight">{faq.q}</span>
                 {openIndex === index ? (
-                  <Minus className="h-5 w-5 text-yellow-500" />
+                  <Minus className="h-4 w-4 text-yellow-400" />
                 ) : (
-                  <Plus className="h-5 w-5 text-gray-400" />
+                  <Plus className="h-4 w-4 text-gray-500" />
                 )}
               </button>
               
               {openIndex === index && (
-                <div className="px-6 pb-6 pt-2">
-                  <p className="text-gray-600 leading-relaxed font-medium">
+                <div className="px-5 pb-5 pt-0">
+                  <p className="text-[11px] text-gray-400 leading-relaxed font-bold lowercase first-letter:uppercase">
                     {faq.a}
                   </p>
                 </div>

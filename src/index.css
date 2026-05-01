@@ -12,23 +12,24 @@
   --font-mono: "Space Grotesk", monospace;
 
   --color-hotstar-bg: #030b17;
-  --color-hotstar-surface: #0b1a2a;
+  --color-hotstar-surface: #101c2b;
   --color-hotstar-border: #1a2c3d;
+  --color-hotstar-accent: #f2e13d;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    @apply font-sans;
+    @apply font-sans selection:bg-hotstar-accent/30;
   }
   body {
-    @apply antialiased transition-colors duration-500 bg-background text-foreground;
+    @apply antialiased transition-colors duration-500 bg-[var(--color-hotstar-bg)] text-white;
   }
   .dark body {
     @apply text-gray-100 bg-[var(--color-hotstar-bg)];
   }
   * {
-    @apply border-border outline-ring/50;
+    @apply border-white/5 outline-ring/50;
   }
 }
 
@@ -170,5 +171,14 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
   }
 }

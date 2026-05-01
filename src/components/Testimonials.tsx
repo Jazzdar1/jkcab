@@ -66,22 +66,21 @@ export default function Testimonials() {
   };
 
   return (
-    <section className="py-24 bg-gray-50 overflow-hidden">
+    <section className="py-20 bg-[var(--color-hotstar-bg)] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-sm font-bold text-yellow-600 uppercase tracking-[0.2em] mb-4">Happy Travellers</h2>
-            <h3 className="text-4xl font-bold text-gray-900 mb-6">Real Stories, Real Experiences</h3>
-            <div className="w-24 h-1 bg-yellow-400 mx-auto rounded-full"></div>
+            <h2 className="text-[10px] font-black text-yellow-400 uppercase tracking-[0.3em] mb-4">Happy Travellers</h2>
+            <h3 className="text-4xl font-black text-white mb-6 uppercase tracking-tight font-display">Real Stories</h3>
           </motion.div>
         </div>
 
         <div className="relative max-w-4xl mx-auto">
-          <div className="min-h-[400px] flex items-center justify-center relative">
+          <div className="min-h-[350px] flex items-center justify-center relative">
             <AnimatePresence initial={false} custom={direction}>
               <motion.div
                 key={index}
@@ -96,28 +95,28 @@ export default function Testimonials() {
                 }}
                 className="absolute w-full"
               >
-                <div className="bg-white p-10 md:p-16 rounded-[3rem] shadow-2xl relative group border border-gray-100">
-                  <div className="absolute top-12 right-12 opacity-5 text-gray-900">
-                    <Quote className="h-24 w-24 fill-current" />
+                <div className="bg-[#101c2b] p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative group border border-white/5">
+                  <div className="absolute top-8 right-8 opacity-5 text-yellow-400">
+                    <Quote className="h-20 w-20 fill-current" />
                   </div>
                   
-                  <div className="flex space-x-1 mb-8">
+                  <div className="flex space-x-1 mb-6">
                     {[...Array(reviews[index].rating)].map((_, i) => (
-                      <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
 
-                  <p className="text-xl md:text-2xl text-gray-700 italic mb-10 leading-relaxed font-medium">
+                  <p className="text-lg md:text-xl text-gray-300 italic mb-8 leading-relaxed font-medium">
                     "{reviews[index].text}"
                   </p>
 
                   <div className="flex items-center">
-                    <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center text-black font-black text-xl mr-6 shadow-lg shadow-yellow-400/20">
+                    <div className="w-14 h-14 bg-yellow-400 rounded-2xl flex items-center justify-center text-black font-black text-lg mr-4 shadow-xl shadow-yellow-400/10">
                       {reviews[index].name.charAt(0)}
                     </div>
                     <div>
-                      <h4 className="text-xl font-bold text-gray-900">{reviews[index].name}</h4>
-                      <p className="text-sm font-bold text-yellow-600 uppercase tracking-[0.2em]">{reviews[index].location}</p>
+                      <h4 className="text-lg font-black text-white tracking-tight">{reviews[index].name}</h4>
+                      <p className="text-[9px] font-black text-yellow-400 uppercase tracking-[0.2em]">{reviews[index].location}</p>
                     </div>
                   </div>
                 </div>
@@ -125,14 +124,13 @@ export default function Testimonials() {
             </AnimatePresence>
           </div>
 
-          {/* Controls */}
-          <div className="flex justify-center mt-12 space-x-6">
+          <div className="flex justify-center mt-8 space-x-4">
             <button
               onClick={prevSlide}
-              className="p-4 rounded-2xl bg-white text-black shadow-lg hover:bg-yellow-400 transition-all border border-gray-100 active:scale-90"
+              className="p-3 rounded-xl bg-white/5 text-white hover:bg-yellow-400 hover:text-black transition-all border border-white/5 active:scale-95"
               aria-label="Previous testimonial"
             >
-              <ChevronLeft className="h-6 w-6" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
             
             <div className="flex items-center space-x-2">
@@ -143,8 +141,8 @@ export default function Testimonials() {
                     setDirection(i > index ? 1 : -1);
                     setIndex(i);
                   }}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    i === index ? 'w-8 bg-yellow-400' : 'w-2.5 bg-gray-300 hover:bg-gray-400'
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === index ? 'w-6 bg-yellow-400' : 'w-1.5 bg-white/10 hover:bg-white/20'
                   }`}
                 />
               ))}
@@ -152,10 +150,10 @@ export default function Testimonials() {
 
             <button
               onClick={nextSlide}
-              className="p-4 rounded-2xl bg-white text-black shadow-lg hover:bg-yellow-400 transition-all border border-gray-100 active:scale-90"
+              className="p-3 rounded-xl bg-white/5 text-white hover:bg-yellow-400 hover:text-black transition-all border border-white/5 active:scale-95"
               aria-label="Next testimonial"
             >
-              <ChevronRight className="h-6 w-6" />
+              <ChevronRight className="h-5 w-5" />
             </button>
           </div>
         </div>

@@ -20,7 +20,7 @@ import BookingForm from '@/components/BookingForm';
 import { AuthProvider } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { SiteProvider } from '@/context/SiteContext';
-import { VEHICLES as FALLBACK_VEHICLES } from '@/constants';
+import { VEHICLES as FALLBACK_VEHICLES, CONTACT_INFO } from '@/constants';
 import { useLanguage } from '@/context/LanguageContext';
 import { useSite } from '@/context/SiteContext';
 import { db } from '@/lib/firebase';
@@ -75,9 +75,11 @@ function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => 
     const fetchVehicle = async () => {
       if (!id) return;
       try {
-        const vehicleDoc = await getDoc(doc(db, 'fleet', id));
-        if (vehicleDoc.exists()) {
-          setVehicle(vehicleDoc.data());
+        const docRef = doc(db, 'fleet', id);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          setVehicle(docSnap.data());
         }
       } catch (err) {
         console.error("Error fetching vehicle:", err);
@@ -111,13 +113,13 @@ function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => 
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      className="pt-32 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-[var(--color-hotstar-bg)] min-h-screen"
     >
       <button 
         onClick={() => navigate(-1)}
-        className="mb-12 flex items-center space-x-3 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors group"
+        className="mb-12 flex items-center space-x-3 text-gray-500 hover:text-white transition-colors group"
       >
-        <div className="p-2 bg-gray-100 dark:bg-white/5 rounded-xl group-hover:bg-yellow-400 group-hover:text-black transition-all">
+        <div className="p-2 bg-white/5 rounded-xl group-hover:bg-yellow-400 group-hover:text-black transition-all">
           <ArrowLeft className="h-4 w-4" />
         </div>
         <span className="text-[10px] font-black uppercase tracking-[0.3em]">{settings.labelBookingBack}</span>
@@ -128,14 +130,14 @@ function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => 
           <motion.div 
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl border border-gray-100 dark:border-white/5"
+            className="aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5"
           >
             <img src={vehicle.image} alt={vehicle.name} className="w-full h-full object-cover" />
           </motion.div>
           
           <div className="grid grid-cols-3 gap-4">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="aspect-square rounded-3xl bg-gray-100 dark:bg-white/5 overflow-hidden border border-gray-100 dark:border-white/5 opacity-40 hover:opacity-100 transition-opacity cursor-pointer">
+              <div key={i} className="aspect-square rounded-2xl bg-white/5 overflow-hidden border border-white/5 opacity-40 hover:opacity-100 transition-opacity cursor-pointer">
                 <img src={vehicle.image} className="w-full h-full object-cover" alt="Gallery" />
               </div>
             ))}
@@ -149,56 +151,56 @@ function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => 
                 {vehicle.type}
               </span>
               {vehicle.isPremium && (
-                <span className="bg-black text-white dark:bg-white dark:text-black px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider">
+                <span className="bg-white text-black px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider">
                   Premium Class
                 </span>
               )}
             </div>
-            <h1 className="text-6xl font-black text-gray-900 dark:text-white mb-6 font-display tracking-tighter leading-none">{vehicle.name}</h1>
+            <h1 className="text-5xl md:text-7xl font-black text-white mb-6 font-display tracking-tighter leading-none">{vehicle.name}</h1>
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-3">
                 <div className="p-3 bg-yellow-400/10 rounded-2xl">
-                  <Users className="h-5 w-5 text-yellow-600" />
+                  <Users className="h-5 w-5 text-yellow-500" />
                 </div>
                 <div>
-                  <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{settings.labelCapacity}</div>
-                  <div className="text-sm font-black text-gray-900 dark:text-white uppercase">{vehicle.capacity}</div>
+                  <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{settings.labelCapacity}</div>
+                  <div className="text-sm font-black text-white uppercase">{vehicle.capacity}</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="p-3 bg-green-400/10 rounded-2xl">
-                  <Star className="h-5 w-5 text-green-600" />
+                  <Star className="h-5 w-5 text-green-500" />
                 </div>
                 <div>
-                  <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{settings.labelPricing}</div>
-                  <div className="text-sm font-black text-gray-900 dark:text-white uppercase">{vehicle.pricePerDay} <span className="text-[10px] text-gray-400">/ Day</span></div>
+                  <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{settings.labelPricing}</div>
+                  <div className="text-sm font-black text-white uppercase">{vehicle.pricePerDay} <span className="text-[10px] text-gray-400">/ Day</span></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-10 bg-gray-50/50 dark:bg-white/5 rounded-[2.5rem] border border-gray-100 dark:border-white/10">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-8">Premium Features</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
+          <div className="p-8 md:p-10 bg-[#101c2b] rounded-[2.5rem] border border-white/5">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-8">Premium Features</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
               {vehicle.features.map((feature, i) => (
                 <div key={i} className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-2xl bg-white dark:bg-white/5 flex items-center justify-center shadow-sm border border-gray-100 dark:border-white/5">
+                  <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center shadow-sm border border-white/5">
                     <Check className="h-4 w-4 text-green-500" />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-widest text-gray-700 dark:text-gray-300">{feature}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">{feature}</span>
                 </div>
               ))}
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-2xl bg-white dark:bg-white/5 flex items-center justify-center shadow-sm border border-gray-100 dark:border-white/5">
+                <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center shadow-sm border border-white/5">
                   <ShieldCheck className="h-4 w-4 text-yellow-500" />
                 </div>
-                <span className="text-xs font-black uppercase tracking-widest text-gray-700 dark:text-gray-300">Full Insurance</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">Full Insurance</span>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-2xl bg-white dark:bg-white/5 flex items-center justify-center shadow-sm border border-gray-100 dark:border-white/5">
+                <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center shadow-sm border border-white/5">
                   <Calendar className="h-4 w-4 text-blue-500" />
                 </div>
-                <span className="text-xs font-black uppercase tracking-widest text-gray-700 dark:text-gray-300">Flexible Dates</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">Flexible Dates</span>
               </div>
             </div>
           </div>
@@ -206,22 +208,22 @@ function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button 
               onClick={() => onBook(id!, vehicle.name)}
-              className="flex-[2] bg-yellow-400 text-black h-20 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-yellow-400/20 hover:bg-black hover:text-white transition-all transform active:scale-95 flex items-center justify-center"
+              className="flex-[2] bg-yellow-400 text-black h-20 rounded-[1.75rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-yellow-400/20 hover:bg-white hover:scale-105 transition-all transform active:scale-95 flex items-center justify-center"
             >
               {settings.labelBookNow}
             </button>
             <a 
-              href="https://wa.me/917006268328"
+              href={`https://wa.me/${CONTACT_INFO.whatsapp.replace(/[^0-9]/g, '')}`}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 bg-white dark:bg-white/5 text-gray-900 dark:text-white h-20 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] border border-gray-200 dark:border-white/10 flex items-center justify-center space-x-2 hover:bg-gray-50 dark:hover:bg-white/10 transition-all"
+              className="flex-1 bg-white/5 text-white h-20 rounded-[1.75rem] font-black uppercase tracking-[0.2em] text-[10px] border border-white/5 flex items-center justify-center space-x-2 hover:bg-white/10 transition-all"
             >
               <MessageSquare className="h-4 w-4" />
               <span>{settings.labelInquire}</span>
             </a>
           </div>
           
-          <p className="text-center text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.4em]">
+          <p className="text-center text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">
             {settings.labelNoAdvance}
           </p>
         </div>
@@ -253,7 +255,7 @@ function AppContent() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState<any>(undefined);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');

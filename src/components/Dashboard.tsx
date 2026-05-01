@@ -117,7 +117,7 @@ export default function Dashboard() {
   if (!loading && !user && !isAdmin) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
+    <div className="max-w-7xl mx-auto px-4 py-12 min-h-screen bg-[var(--color-hotstar-bg)]">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 gap-8">
         <div className="space-y-4">
           <div className="flex items-center space-x-3">
@@ -125,23 +125,23 @@ export default function Dashboard() {
               {t('dashboard.cp')}
             </span>
             {isAdmin && activeTab === 'admin' && (
-              <span className="px-3 py-1 bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full animate-pulse">
+              <span className="px-3 py-1 bg-white text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-full animate-pulse font-sans">
                 Live Admin Mode
               </span>
             )}
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-gray-900 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-black text-white leading-tight font-display tracking-tighter">
             {t('dashboard.welcome')}, <br/>
-            <span className="text-yellow-500 font-black">{profile?.name?.split(' ')[0] || user.displayName?.split(' ')[0]}</span>
+            <span className="text-yellow-400 font-black">{profile?.name?.split(' ')[0] || user.displayName?.split(' ')[0]}</span>
           </h1>
         </div>
         
         <div className="flex flex-wrap items-center gap-4">
           {isAdmin && (
-            <div className="bg-gray-100/50 p-1.5 rounded-[2rem] flex border border-gray-100 backdrop-blur-sm relative">
+            <div className="bg-white/5 p-1.5 rounded-[2rem] flex border border-white/5 backdrop-blur-sm relative">
               <motion.div
                 layoutId="activeTab"
-                className="absolute bg-white rounded-[1.5rem] shadow-xl shadow-black/5"
+                className="absolute bg-white/10 rounded-[1.5rem] shadow-xl border border-white/10"
                 initial={false}
                 animate={{
                   x: activeTab === 'bookings' ? 0 : '100%',
@@ -152,21 +152,28 @@ export default function Dashboard() {
               />
               <button 
                 onClick={() => setActiveTab('bookings')}
-                className={`relative z-10 px-8 py-3 rounded-[1.5rem] text-sm font-black transition-all ${activeTab === 'bookings' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+                className={`relative z-10 px-8 py-3 rounded-[1.5rem] text-xs uppercase tracking-widest font-black transition-all ${activeTab === 'bookings' ? 'text-white' : 'text-gray-500 hover:text-white'}`}
               >
                 {t('dashboard.myTrips')}
               </button>
               <button 
                 onClick={() => setActiveTab('admin')}
-                className={`relative z-10 px-8 py-3 rounded-[1.5rem] text-sm font-black transition-all ${activeTab === 'admin' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+                className={`relative z-10 px-8 py-3 rounded-[1.5rem] text-xs uppercase tracking-widest font-black transition-all ${activeTab === 'admin' ? 'text-white' : 'text-gray-500 hover:text-white'}`}
               >
                 {t('dashboard.adminPanel')}
               </button>
             </div>
           )}
           <button 
+            onClick={() => navigate('/admin')}
+            className="w-14 h-14 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-yellow-400 hover:bg-yellow-400 hover:text-black transition-all group shadow-sm active:scale-90"
+            title="Admin Settings"
+          >
+            <Settings className="h-6 w-6 group-hover:rotate-90 transition-transform" />
+          </button>
+          <button 
             onClick={() => logout()}
-            className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-red-500 hover:bg-red-50 transition-all group shadow-sm active:scale-90"
+            className="w-14 h-14 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-red-500/10 transition-all group shadow-sm active:scale-90"
             title="Sign Out"
           >
             <LogOut className="h-6 w-6 group-hover:scale-110 transition-transform" />
@@ -175,34 +182,34 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('dashboard.all')}</p>
-           <div className="text-3xl font-black text-gray-900">{stats.total}</div>
+        <div className="bg-[#101c2b] p-6 rounded-[2rem] border border-white/5 shadow-xl">
+           <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{t('dashboard.all')}</p>
+           <div className="text-3xl font-black text-white font-display tracking-tight">{stats.total}</div>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-l-4 border-l-yellow-400">
-           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('dashboard.pending')}</p>
-           <div className="text-3xl font-black text-yellow-600">{stats.pending}</div>
+        <div className="bg-[#101c2b] p-6 rounded-[2rem] border border-white/5 shadow-xl border-l-4 border-l-yellow-400">
+           <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{t('dashboard.pending')}</p>
+           <div className="text-3xl font-black text-yellow-400 font-display tracking-tight">{stats.pending}</div>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-l-4 border-l-green-400">
-           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('dashboard.confirmed')}</p>
-           <div className="text-3xl font-black text-green-600">{stats.confirmed}</div>
+        <div className="bg-[#101c2b] p-6 rounded-[2rem] border border-white/5 shadow-xl border-l-4 border-l-green-400">
+           <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{t('dashboard.confirmed')}</p>
+           <div className="text-3xl font-black text-green-400 font-display tracking-tight">{stats.confirmed}</div>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-l-4 border-l-red-400">
-           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('dashboard.cancelled')}</p>
-           <div className="text-3xl font-black text-red-600">{stats.cancelled}</div>
+        <div className="bg-[#101c2b] p-6 rounded-[2rem] border border-white/5 shadow-xl border-l-4 border-l-red-400">
+           <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{t('dashboard.cancelled')}</p>
+           <div className="text-3xl font-black text-red-500 font-display tracking-tight">{stats.cancelled}</div>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         <aside className="w-full lg:w-72 space-y-6">
-          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm sticky top-28">
-             <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center">
-                <Filter className="h-4 w-4 mr-2 text-yellow-500" /> {t('dashboard.filterBy')}
+          <div className="bg-[#101c2b] rounded-[2.5rem] p-8 border border-white/5 shadow-xl sticky top-28">
+             <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-8 flex items-center">
+                <Filter className="h-4 w-4 mr-2 text-yellow-400" /> {t('dashboard.filterBy')}
              </h4>
              
-             <div className="space-y-2">
+             <div className="space-y-3">
                 {[
-                  { id: 'all', label: t('dashboard.all'), color: 'bg-black' },
+                  { id: 'all', label: t('dashboard.all'), color: 'bg-white' },
                   { id: 'pending', label: t('dashboard.pending'), color: 'bg-yellow-400' },
                   { id: 'confirmed', label: t('dashboard.confirmed'), color: 'bg-green-500' },
                   { id: 'cancelled', label: t('dashboard.cancelled'), color: 'bg-red-500' }
@@ -210,10 +217,10 @@ export default function Dashboard() {
                   <button
                     key={status.id}
                     onClick={() => setStatusFilter(status.id)}
-                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold transition-all group ${
+                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all group ${
                       statusFilter === status.id 
-                        ? 'bg-gray-900 text-white shadow-xl shadow-black/10 scale-[1.02]' 
-                        : 'hover:bg-gray-50 text-gray-500 hover:text-black'
+                        ? 'bg-yellow-400 text-black shadow-xl shadow-yellow-400/20 scale-[1.02]' 
+                        : 'hover:bg-white/5 text-gray-500 hover:text-white'
                     }`}
                   >
                     <span>{status.label}</span>
@@ -226,11 +233,11 @@ export default function Dashboard() {
 
         <main className="flex-1">
           <div className="relative mb-8">
-             <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400" />
+             <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-600" />
              <input 
                type="text"
                placeholder={t('dashboard.searchPlaceholder')}
-               className="w-full pl-16 pr-6 py-6 bg-white border border-gray-100 rounded-[2rem] outline-none focus:ring-4 focus:ring-yellow-400/20 transition-all text-base font-bold shadow-sm"
+               className="w-full pl-16 pr-6 py-6 bg-[#101c2b] border border-white/5 rounded-[2rem] outline-none focus:ring-4 focus:ring-yellow-400/10 transition-all text-sm font-black uppercase tracking-widest text-white shadow-xl"
                value={searchQuery}
                onChange={(e) => setSearchQuery(e.target.value)}
              />
@@ -240,21 +247,21 @@ export default function Dashboard() {
             {loading ? (
               <div className="py-32 flex flex-col items-center justify-center text-center">
                 <div className="relative mb-6">
-                   <div className="w-16 h-16 border-4 border-yellow-400/20 border-t-yellow-400 rounded-full animate-spin"></div>
+                   <div className="w-16 h-16 border-4 border-yellow-400/10 border-t-yellow-400 rounded-full animate-spin"></div>
                    <Loader2 className="h-6 w-6 text-yellow-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
                 </div>
-                <p className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">{t('dashboard.fetching')}</p>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">{t('dashboard.fetching')}</p>
               </div>
             ) : filteredBookings.length === 0 ? (
-              <div className="bg-white border-2 border-dashed border-gray-100 rounded-[3rem] py-24 text-center">
-                 <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 transform -rotate-6">
-                    <History className="h-10 w-10 text-gray-200" />
+              <div className="bg-[#101c2b] border-2 border-dashed border-white/5 rounded-[3rem] py-24 text-center">
+                 <div className="w-24 h-24 bg-white/5 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 transform -rotate-6">
+                    <History className="h-10 w-10 text-gray-500 opacity-20" />
                  </div>
-                 <h3 className="text-2xl font-black text-gray-900 mb-2">{t('dashboard.noBookings')}</h3>
-                 <p className="text-gray-500 font-medium">{t('dashboard.historyEmpty')}</p>
+                 <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">{t('dashboard.noBookings')}</h3>
+                 <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">{t('dashboard.historyEmpty')}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-6 pb-20">
                 <AnimatePresence mode="popLayout">
                 {filteredBookings.map((booking) => (
                   <motion.div
@@ -263,14 +270,14 @@ export default function Dashboard() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     key={booking.id}
-                    className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden"
+                    className="bg-[#101c2b] rounded-[2.5rem] p-8 border border-white/5 shadow-xl hover:border-yellow-400/20 transition-all duration-300 group relative overflow-hidden"
                   >
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-gray-50 rounded-full -mr-12 -mt-12 group-hover:bg-yellow-400/10 transition-colors"></div>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12 group-hover:bg-yellow-400/5 transition-colors"></div>
                     
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 relative z-10">
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-3 mb-6">
-                          <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${
+                          <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg ${
                             booking.status === 'confirmed' ? 'bg-green-500 text-white' :
                             booking.status === 'cancelled' ? 'bg-red-500 text-white' :
                             'bg-yellow-400 text-black'
@@ -279,11 +286,11 @@ export default function Dashboard() {
                              booking.status === 'confirmed' ? t('dashboard.confirmed') : 
                              t('dashboard.cancelled')}
                           </span>
-                          <span className="px-4 py-1.5 bg-gray-50 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center">
-                            <Clock className="h-3 w-3 mr-1.5" />
+                          <span className="px-4 py-1.5 bg-white/5 rounded-xl text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center border border-white/5">
+                            <Clock className="h-3 w-3 mr-1.5 text-yellow-400" />
                             {booking.createdAt?.toDate ? booking.createdAt.toDate().toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : t('dashboard.recent')}
                           </span>
-                          <span className="px-4 py-1.5 bg-gray-50 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                          <span className="px-4 py-1.5 bg-white/5 rounded-xl text-[9px] font-black text-gray-400 uppercase tracking-widest border border-white/5">
                             ID: {booking.id.slice(0, 8)}
                           </span>
                         </div>
@@ -291,50 +298,50 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                           <div className="space-y-6">
                              <div className="flex items-start space-x-4">
-                               <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-50 transition-colors">
-                                  <MapPin className="h-5 w-5 text-yellow-500" />
+                               <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-400 group-hover:text-black transition-colors border border-white/5">
+                                  <MapPin className="h-5 w-5 text-yellow-400 group-hover:text-black" />
                                </div>
                                <div>
-                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('dashboard.route')}</p>
-                                 <h4 className="text-lg font-bold text-gray-900 leading-tight">
-                                   {booking.pickup} <ChevronRight className="inline h-4 w-4 text-gray-300 mx-1" /> {booking.dropoff}
+                                 <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1.5 leading-none">Trip Vector</p>
+                                 <h4 className="text-base font-black text-white leading-tight uppercase tracking-tight">
+                                   {booking.pickup} <ChevronRight className="inline h-4 w-4 text-gray-600 mx-1" /> {booking.dropoff}
                                  </h4>
                                </div>
                              </div>
 
                              <div className="flex items-start space-x-4">
-                               <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-50 transition-colors">
-                                  <Car className="h-5 w-5 text-yellow-500" />
+                               <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-400 group-hover:text-black transition-colors border border-white/5">
+                                  <Car className="h-5 w-5 text-yellow-400 group-hover:text-black" />
                                </div>
                                <div>
-                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('dashboard.details')}</p>
-                                 <h4 className="text-lg font-bold text-gray-900 uppercase">
+                                 <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1.5 leading-none">Vehicle Specifics</p>
+                                 <h4 className="text-base font-black text-white uppercase tracking-tight">
                                    {booking.vehicle} • {booking.passengers} PAX
                                  </h4>
                                </div>
                              </div>
                           </div>
 
-                          <div className="p-6 bg-gray-50/50 rounded-3xl border border-gray-100 flex flex-col justify-center">
-                            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                          <div className="p-6 bg-black/20 rounded-[2rem] border border-white/5 flex flex-col justify-center">
+                            <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
                                <div className="flex items-center space-x-3">
-                                  <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                                     <UserIcon className="h-4 w-4 text-gray-400" />
+                                  <div className="w-8 h-8 rounded-xl bg-white/5 shadow-sm flex items-center justify-center border border-white/5">
+                                     <UserIcon className="h-4 w-4 text-gray-500" />
                                   </div>
                                   <div>
-                                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{t('dashboard.customer')}</p>
-                                     <p className="text-sm font-bold text-gray-900">{booking.customerName}</p>
+                                     <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">Manifest Contact</p>
+                                     <p className="text-xs font-black text-white uppercase">{booking.customerName}</p>
                                   </div>
                                </div>
                             </div>
                             <div className="flex items-center justify-between">
                                <div className="flex items-center space-x-3">
-                                  <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                                     <Phone className="h-4 w-4 text-gray-400" />
+                                  <div className="w-8 h-8 rounded-xl bg-white/5 shadow-sm flex items-center justify-center border border-white/5">
+                                     <Phone className="h-4 w-4 text-gray-500" />
                                   </div>
                                   <div>
-                                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{t('dashboard.contact')}</p>
-                                     <p className="text-sm font-bold text-gray-900">{booking.customerPhone}</p>
+                                     <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">Digit Link</p>
+                                     <p className="text-xs font-black text-white uppercase">{booking.customerPhone}</p>
                                   </div>
                                </div>
                             </div>
@@ -348,9 +355,9 @@ export default function Dashboard() {
                              <button
                                onClick={() => updateStatus(booking.id, 'confirmed')}
                                disabled={booking.status === 'confirmed'}
-                               className={`w-full py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg ${
+                               className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl ${
                                  booking.status === 'confirmed' 
-                                   ? 'bg-gray-100 text-gray-400 shadow-none' 
+                                   ? 'bg-white/5 text-gray-500 shadow-none border border-white/5' 
                                    : 'bg-green-500 text-white hover:bg-green-600 shadow-green-500/20 active:scale-95'
                                }`}
                              >
@@ -359,19 +366,19 @@ export default function Dashboard() {
                              <button
                                onClick={() => updateStatus(booking.id, 'cancelled')}
                                disabled={booking.status === 'cancelled'}
-                               className={`w-full py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
+                               className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
                                  booking.status === 'cancelled' 
-                                   ? 'bg-gray-100 text-gray-400' 
-                                   : 'bg-red-50 text-red-500 hover:bg-red-100 active:scale-95'
+                                   ? 'bg-white/5 text-gray-500 border border-white/5' 
+                                   : 'bg-red-500/10 text-red-500 hover:bg-red-500/20 active:scale-95 border border-red-500/20'
                                }`}
                              >
                                {t('dashboard.cancelled')}
                              </button>
                              <button
                                onClick={() => deleteBooking(booking.id)}
-                               className="w-full py-2 text-[10px] font-black text-gray-300 hover:text-red-500 uppercase tracking-widest transition-colors mt-2"
+                               className="w-full py-2 text-[9px] font-black text-gray-600 hover:text-red-500 uppercase tracking-widest transition-colors mt-2"
                              >
-                               Delete Perm
+                               Purge Entry
                              </button>
                            </div>
                          ) : (
@@ -381,18 +388,18 @@ export default function Dashboard() {
                                  const message = `Hello JK CABS, I need help with my booking. \n\nBooking ID: ${booking.id}\nCustomer: ${booking.customerName}\nRoute: ${booking.pickup} to ${booking.dropoff}`;
                                  window.open(`https://wa.me/917006268328?text=${encodeURIComponent(message)}`, '_blank');
                                }}
-                               className="px-8 py-4 bg-black text-white rounded-[1.5rem] text-sm font-black flex items-center hover:bg-gray-900 transition-all shadow-2xl shadow-black/20 active:scale-95"
+                               className="px-8 py-4 bg-yellow-400 text-black rounded-2xl text-xs font-black uppercase tracking-widest flex items-center hover:bg-white transition-all shadow-xl shadow-yellow-400/20 active:scale-95"
                              >
-                               <Phone className="h-5 w-5 mr-3" />
+                               <Phone className="h-4 w-4 mr-3" />
                                {t('dashboard.support')}
                              </button>
                              {booking.status === 'pending' && (
                                <button 
                                  onClick={() => updateStatus(booking.id, 'cancelled')}
-                                 className="px-8 py-4 bg-red-50 text-red-500 rounded-[1.5rem] text-sm font-black flex items-center hover:bg-red-100 transition-all active:scale-95 border border-red-100"
+                                 className="px-8 py-4 bg-white/5 text-red-500 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center hover:bg-white transition-all active:scale-95 border border-white/5"
                                >
-                                 <XCircle className="h-5 w-5 mr-3" />
-                                 Cancel Trip
+                                 <XCircle className="h-4 w-4 mr-3" />
+                                 Abort Trip
                                </button>
                              )}
                            </div>

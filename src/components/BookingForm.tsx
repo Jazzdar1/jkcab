@@ -21,9 +21,9 @@ import {
 import { VEHICLES, CONTACT_INFO } from '@/constants';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from '@/lib/firebaseUtils';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { handleFirestoreError, OperationType } from '@/lib/firebaseUtils';
 import { useSite } from '@/context/SiteContext';
 
 declare global {
@@ -165,7 +165,7 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
       try {
         await addDoc(collection(db, path), bookingData);
       } catch (error) {
-        console.error("Firestore booking error:", error);
+        handleFirestoreError(error, OperationType.WRITE, path);
       }
 
       // Simulate Email Sending
@@ -205,22 +205,19 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
   };
 
   return (
-    <div className="bg-white/90 dark:bg-hotstar-surface/90 backdrop-blur-2xl rounded-[3rem] p-8 md:p-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.2)] border border-white/40 dark:border-white/10 relative overflow-hidden group/form">
-      {/* Decorative gradient */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400/5 rounded-full -mr-32 -mt-32 blur-3xl transition-all group-hover/form:bg-yellow-400/10"></div>
-      
+    <div className="bg-[#101c2b]/80 backdrop-blur-3xl rounded-[2.5rem] p-5 md:p-6 border border-white/10 relative overflow-hidden group/form shadow-2xl">
       <div className="relative z-10">
-        <div className="flex items-center space-x-3 mb-10">
-           <div className="w-1.5 h-8 bg-yellow-400 rounded-full shadow-[0_0_15px_rgba(250,204,21,0.5)]"></div>
+        <div className="flex items-center space-x-3 mb-6">
+           <div className="w-1 h-6 bg-yellow-400 rounded-full shadow-[0_0_10px_rgba(250,204,21,0.5)]"></div>
            <div className="flex flex-col">
-             <h3 className="text-2xl font-black text-gray-900 dark:text-white font-display tracking-tight leading-none uppercase tracking-[0.1em]">
+             <h3 className="text-xl font-black text-white font-display tracking-tight leading-none uppercase tracking-widest">
                {settings.labelBookingTitle}
              </h3>
-             <p className="text-[10px] text-gray-400 mt-2 font-black uppercase tracking-widest">{settings.labelBookingSubtitle}</p>
+             <p className="text-[8px] text-gray-500 mt-1 font-black uppercase tracking-widest">{settings.labelBookingSubtitle}</p>
            </div>
         </div>
 
-        <form onSubmit={handleNext} className="space-y-6">
+        <form onSubmit={handleNext} className="space-y-4">
           <AnimatePresence mode="wait">
             {step === 'booking' ? (
               <motion.div
@@ -230,17 +227,17 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                 exit={{ opacity: 0, scale: 0.98 }}
                 className="space-y-6"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-3 ml-1">
+                    <label className="block text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-2 ml-1">
                        {t('booking.pickup')}
                     </label>
                     <div className="relative group/input">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
+                      <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
                       <input
                         type="text"
-                        placeholder="Srinagar Airport"
-                        className={`w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-white/5 border-2 rounded-2xl focus:ring-0 focus:border-yellow-400 focus:bg-white dark:focus:bg-white/10 transition-all text-sm font-bold text-gray-900 dark:text-white outline-none placeholder:text-gray-300 dark:placeholder:text-gray-600 ${errors.pickup ? 'border-red-500 bg-red-50 dark:bg-red-500/10' : 'border-transparent hover:border-gray-200 dark:hover:border-white/20'}`}
+                        placeholder="Airport/Hotel"
+                        className={`w-full pl-10 pr-3 py-3 bg-white/5 border border-transparent rounded-xl focus:border-yellow-400 transition-all text-xs font-bold text-white outline-none placeholder:text-gray-600 ${errors.pickup ? 'border-red-500 bg-red-500/10' : 'hover:border-white/10'}`}
                         value={formData.pickup}
                         onChange={(e) => setFormData({...formData, pickup: e.target.value})}
                       />
@@ -248,15 +245,15 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                   </div>
                   
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-3 ml-1">
+                    <label className="block text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-2 ml-1">
                        {t('booking.dropoff')}
                     </label>
                     <div className="relative group/input">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
+                      <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
                       <input
                         type="text"
-                        placeholder="Gulmarg"
-                        className={`w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-white/5 border-2 rounded-2xl focus:ring-0 focus:border-yellow-400 focus:bg-white dark:focus:bg-white/10 transition-all text-sm font-bold text-gray-900 dark:text-white outline-none placeholder:text-gray-300 dark:placeholder:text-gray-600 ${errors.dropoff ? 'border-red-500 bg-red-50 dark:bg-red-500/10' : 'border-transparent hover:border-gray-200 dark:hover:border-white/20'}`}
+                        placeholder="Destination"
+                        className={`w-full pl-10 pr-3 py-3 bg-white/5 border border-transparent rounded-xl focus:border-yellow-400 transition-all text-xs font-bold text-white outline-none placeholder:text-gray-600 ${errors.dropoff ? 'border-red-500 bg-red-500/10' : 'hover:border-white/10'}`}
                         value={formData.dropoff}
                         onChange={(e) => setFormData({...formData, dropoff: e.target.value})}
                       />
@@ -264,16 +261,16 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-3 ml-1">
+                    <label className="block text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-2 ml-1">
                        {t('booking.date')}
                     </label>
                     <div className="relative group/input">
-                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
+                      <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
                       <input
                         type="date"
-                        className={`w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-white/5 border-2 rounded-2xl focus:ring-0 focus:border-yellow-400 focus:bg-white dark:focus:bg-white/10 transition-all text-sm font-bold text-gray-900 dark:text-white outline-none ${errors.date ? 'border-red-500 bg-red-50 dark:bg-red-500/10' : 'border-transparent hover:border-gray-200 dark:hover:border-white/20'}`}
+                        className={`w-full pl-10 pr-3 py-3 bg-white/5 border border-transparent rounded-xl focus:border-yellow-400 transition-all text-xs font-bold text-white outline-none ${errors.date ? 'border-red-500 bg-red-500/10' : 'hover:border-white/10'}`}
                         value={formData.date}
                         onChange={(e) => setFormData({...formData, date: e.target.value})}
                       />
@@ -281,85 +278,54 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-3 ml-1">
+                    <label className="block text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-2 ml-1">
                        Pax / Passengers
                     </label>
                     <div className="relative group/input">
-                      <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
+                      <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
                       <select
-                        className="w-full pl-12 pr-10 py-4 bg-gray-50/50 dark:bg-white/5 border-2 border-transparent rounded-2xl focus:ring-0 focus:border-yellow-400 focus:bg-white dark:focus:bg-white/10 transition-all text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none cursor-pointer hover:border-gray-200 dark:hover:border-white/20"
+                        className="w-full pl-10 pr-6 py-3 bg-white/5 border border-transparent rounded-xl focus:border-yellow-400 transition-all text-xs font-bold text-white outline-none appearance-none cursor-pointer hover:border-white/10"
                         value={formData.passengers}
                         onChange={(e) => setFormData({...formData, passengers: e.target.value})}
                       >
                         {[1, 2, 3, 4, 5, 6, 7, 8, '8+'].map((num) => (
                           <option key={num} value={num} className="text-gray-900 bg-white">
-                            {num} Passengers
+                            {num} Pax
                           </option>
                         ))}
                       </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within/input:text-yellow-500">
-                         <ChevronRight className="h-4 w-4 rotate-90" />
-                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-3 ml-1">
-                       {formData.isBulk ? 'Select Vehicles' : t('booking.vehicle')}
+                    <label className="block text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-2 ml-1">
+                       {formData.isBulk ? 'Vehicles' : t('booking.vehicle')}
                     </label>
-                    <div className="space-y-2">
-                       {formData.isBulk ? (
-                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10">
-                            {VEHICLES.map((v) => (
-                             <label key={v.id} className="flex items-center space-x-3 p-2 hover:bg-white dark:hover:bg-white/5 rounded-lg cursor-pointer transition-colors">
-                               <input 
-                                 type="checkbox"
-                                 checked={formData.vehicles.includes(v.name)}
-                                 onChange={(e) => {
-                                   const newVehicles = e.target.checked 
-                                     ? [...formData.vehicles, v.name]
-                                     : formData.vehicles.filter(name => name !== v.name);
-                                   if (newVehicles.length > 0) {
-                                     setFormData({...formData, vehicles: newVehicles});
-                                   }
-                                 }}
-                                 className="w-4 h-4 accent-yellow-400"
-                               />
-                               <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300">{v.name}</span>
-                             </label>
-                           ))}
-                         </div>
-                       ) : (
-                        <div className="relative group/input">
-                          <Car className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
-                          <select
-                            className="w-full pl-12 pr-10 py-4 bg-gray-50/50 dark:bg-white/5 border-2 border-transparent rounded-2xl focus:ring-0 focus:border-yellow-400 focus:bg-white dark:focus:bg-white/10 transition-all text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none cursor-pointer hover:border-gray-200 dark:hover:border-white/20"
-                            value={formData.vehicles?.[0] || VEHICLES[0].name}
-                            onChange={(e) => setFormData({...formData, vehicles: [e.target.value]})}
-                          >
-                            {VEHICLES.map((v) => (
-                              <option key={v.id} value={v.name} className="text-gray-900 bg-white">
-                                {v.name}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within/input:text-yellow-500">
-                             <ChevronRight className="h-4 w-4 rotate-90" />
-                          </div>
-                        </div>
-                       )}
+                    <div className="relative group/input">
+                      <Car className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 group-focus-within/input:text-yellow-500 transition-colors" />
+                      <select
+                        className="w-full pl-10 pr-6 py-3 bg-white/5 border border-transparent rounded-xl focus:border-yellow-400 transition-all text-xs font-bold text-white outline-none appearance-none cursor-pointer hover:border-white/10"
+                        value={formData.vehicles?.[0] || VEHICLES[0].name}
+                        onChange={(e) => setFormData({...formData, vehicles: [e.target.value]})}
+                      >
+                        {VEHICLES.map((v) => (
+                          <option key={v.id} value={v.name} className="text-gray-900 bg-white">
+                            {v.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-black text-white hover:bg-yellow-400 hover:text-black py-5 rounded-[1.75rem] font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-3 transition-all transform active:scale-95 group shadow-2xl shadow-black/20"
+                  className="w-full bg-yellow-400 text-black hover:bg-white py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center space-x-2 transition-all transform active:scale-95 group shadow-xl"
                 >
                   <span>{t('booking.continue')}</span>
-                  <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </motion.div>
             ) : step === 'details' ? (
@@ -617,9 +583,21 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                     <span>Confirm on WhatsApp</span>
                   </button>
 
-                  <div className="p-4 bg-yellow-400/10 dark:bg-yellow-400/5 rounded-[1.5rem] flex items-center justify-center space-x-4 border border-yellow-400/20">
-                    <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest leading-none">Redirecting to WhatsApp...</span>
+                  <div className="p-4 bg-yellow-400/10 dark:bg-yellow-400/5 rounded-[1.5rem] flex items-center justify-center space-x-4 border border-yellow-400/20 mb-4">
+                    <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest leading-none">Order Reference ID Sent</span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('booking');
+                      setFormData(initialFormState);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="w-full bg-white/5 text-gray-400 py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white/10 hover:text-white transition-all border border-white/5 active:scale-95"
+                  >
+                    Return to Home
+                  </button>
                 </div>
               </motion.div>
             ) : null}

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface AuthContextType {
   user: any | null;
@@ -26,42 +28,73 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      if (user) {
+        checkAdminStatus(user);
+      } else {
+        setProfile(null);
+        setIsAdmin(false);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const checkAdminStatus = async (user: any) => {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        setProfile(data);
+        if (data.role === 'admin') {
+          setIsAdmin(true);
+        }
+      } else {
+        // Fallback for app-level admin check (e.g. email)
+        const masterAdminEmail = 'darajazb@gmail.com';
+        if (user.email === masterAdminEmail) {
+          setIsAdmin(true);
+        }
+      }
+    } catch (err) {
+      console.error("Admin check failed:", err);
+    }
+  };
+
   const login = async () => {
-    // Local session logic
-    const mockUser = { uid: 'local-admin', email: 'admin@jkcabs.com', displayName: 'Admin' };
-    setUser(mockUser);
-    setProfile({ role: 'admin', name: 'Admin User' });
-    sessionStorage.setItem('admin_session', 'true');
-    sessionStorage.setItem('admin_unlocked', 'true');
-    setIsAdmin(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error;
+    }
   };
 
   const loginAnonymously = async () => {
-    setUser({ uid: 'guest-' + Math.random().toString(36).substr(2, 9), isAnonymous: true });
+    try {
+      await signInAnonymously(auth);
+    } catch (error) {
+      console.error("Anonymous login failed:", error);
+    }
   };
 
   const logout = async () => {
-    setUser(null);
-    setProfile(null);
-    setIsAdmin(false);
-    sessionStorage.removeItem('admin_session');
-    sessionStorage.removeItem('admin_unlocked');
-  };
-
-  useEffect(() => {
-    const sessionActive = sessionStorage.getItem('admin_session');
-    const unlocked = sessionStorage.getItem('admin_unlocked') === 'true';
-    if (sessionActive === 'true' || unlocked) {
-      setUser({ uid: 'local-admin', email: 'admin@jkcabs.com' });
-      setProfile({ role: 'admin', name: 'Admin User' });
-      setIsAdmin(true);
+    try {
+      await signOut(auth);
+      setIsAdmin(false);
+      setUser(null);
+      setProfile(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
-    setLoading(false);
-  }, []);
+  };
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, isAdmin, login, loginAnonymously, logout }}>

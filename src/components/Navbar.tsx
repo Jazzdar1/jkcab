@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Menu, X, Phone, Car, LayoutDashboard, LogIn, User as UserIcon, Globe, ChevronDown, Settings } from 'lucide-react';
+import { Menu, X, Phone, Car, LayoutDashboard, LogIn, User as UserIcon, Globe, ChevronDown, Settings, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CONTACT_INFO } from '@/constants';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { signInWithGoogle } from '@/lib/firebase';
 import Logo from './Logo';
 import { useSite } from '@/context/SiteContext';
 
@@ -175,7 +174,19 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
                     <LayoutDashboard className="h-3.5 w-3.5" />
                   </button>
                 </div>
-              ) : null}
+              ) : (
+                <button
+                  onClick={() => navigate('/admin')}
+                  className={`p-2.5 rounded-2xl transition-all border ${
+                    scrolled || isDashboard || isVehiclePage
+                      ? 'bg-white dark:bg-white/5 border-gray-100 dark:border-hotstar-border text-gray-400 hover:text-red-500 hover:bg-red-50'
+                      : 'bg-white/10 border-white/20 text-white/60 hover:text-white hover:bg-white/20'
+                  }`}
+                  title="Staff Login"
+                >
+                  <Lock className="h-4 w-4" />
+                </button>
+              )}
               
               <a
                 href={`tel:${settings.contactPhone}`}
@@ -246,7 +257,7 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
                 </a>
               ))}
               
-              {isAdmin && (
+              {isAdmin ? (
                 <div className="space-y-4 pt-8 border-t border-gray-100 dark:border-white/10">
                   <button
                     onClick={() => { navigate('/admin'); setIsOpen(false); }}
@@ -261,6 +272,16 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
                   >
                     <LayoutDashboard className="h-6 w-6 mr-4 text-yellow-500" />
                     {settings.navDashboard}
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-8 border-t border-gray-100 dark:border-white/10">
+                  <button
+                    onClick={() => { navigate('/admin'); setIsOpen(false); }}
+                    className="flex items-center w-full p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-xl font-bold text-gray-500"
+                  >
+                    <Lock className="h-6 w-6 mr-4" />
+                    Staff Access
                   </button>
                 </div>
               )}
