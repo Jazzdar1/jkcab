@@ -1,14 +1,5 @@
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInWithRedirect,
-  signOut,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Use environment variables if available (prefixed with VITE_ for Vite apps)
@@ -24,52 +15,13 @@ const config = {
 };
 
 const app = initializeApp(config);
-export const db = getFirestore(app, config.firestoreDatabaseId);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-export const signInAdminWithEmail = (email: string, password: string) =>
-  signInWithEmailAndPassword(auth, email, password);
 
-// Custom sign-in function using popup with locking and error handling
-let isSigningIn = false;
+// Using initializeFirestore instead of getFirestore to pass settings
+// experimentalForceLongPolling is often needed in environments like Vercel or behind certain proxies
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+  experimentalAutoDetectLongPolling: false,
+  ignoreUndefinedProperties: true
+}, config.firestoreDatabaseId || '(default)');
 
-export const signInWithGoogle = async () => {
-  if (isSigningIn) {
-    console.warn('Sign-in already in progress');
-    return;
-  }
-  
-  isSigningIn = true;
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result;
-  } catch (error: any) {
-    // Handle common Firebase Auth errors
-    if (error.code === 'auth/popup-closed-by-user') {
-      console.log('User closed the sign-in popup');
-    } else if (error.code === 'auth/cancelled-popup-request') {
-      console.log('Sign-in popup request was cancelled');
-    } else {
-      console.error('Firebase Auth Error:', error.message);
-    }
-    throw error;
-  } finally {
-    isSigningIn = false;
-  }
-};
-
-// Custom sign-out function
-export const logOut = () => signOut(auth);
-
-// Test connection strictly as required
-async function testConnection() {
-  try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration.");
-    }
-  }
-}
-
-testConnection();
+export const googleProvider = null;

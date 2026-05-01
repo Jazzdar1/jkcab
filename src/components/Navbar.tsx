@@ -152,7 +152,7 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
 
               {loading ? (
                 <div className="h-10 w-10 rounded-2xl bg-gray-100 animate-pulse"></div>
-              ) : user && isAdmin ? (
+              ) : isAdmin ? (
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => navigate('/admin')}
@@ -246,7 +246,7 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
                 </a>
               ))}
               
-              {user && isAdmin && (
+              {isAdmin && (
                 <div className="space-y-4 pt-8 border-t border-gray-100 dark:border-white/10">
                   <button
                     onClick={() => { navigate('/admin'); setIsOpen(false); }}

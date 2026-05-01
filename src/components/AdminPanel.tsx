@@ -28,13 +28,15 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 
 export default function AdminPanel() {
-  const { user, profile, logout, isAdmin: authIsAdmin } = useAuth();
+  const { user, profile, logout, isAdmin: authIsAdmin, loginAnonymously } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'fleet' | 'rates' | 'drivers' | 'packages' | 'bookings' | 'users' | 'settings'>('fleet');
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(authIsAdmin);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [pinInput, setPinInput] = useState('');
+  const [isUnlocked, setIsUnlocked] = useState(false);
   
   // Data States
   const [fleet, setFleet] = useState<any[]>([]);
@@ -80,7 +82,6 @@ export default function AdminPanel() {
       authInfo: {
         userId: user?.uid,
         email: user?.email,
-        emailVerified: user?.emailVerified,
       },
       operationType,
       path
@@ -90,43 +91,31 @@ export default function AdminPanel() {
   };
 
   useEffect(() => {
-    if (!user) {
-      navigate('/');
-      return;
+    // Session check for manual bypass
+    const sessionAuth = sessionStorage.getItem('admin_unlocked');
+    if (sessionAuth === 'true') {
+      setIsUnlocked(true);
+      setIsAdmin(true);
     }
-    
-    const checkAdmin = async () => {
-      try {
-        // Optimized check: Try to fetch specifically the current user's document
-        // from either the admins collection or check their role in the users collection
-        const { getDoc, doc } = await import('firebase/firestore');
-        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        
-        const isAdminUser = adminDoc.exists() || (userDoc.exists() && userDoc.data()?.role === 'admin');
-        
-        if (isAdminUser || user.email === 'darajazb@gmail.com') {
-          setIsAdmin(true);
-        } else {
-          navigate('/');
-        }
-      } catch (err) {
-        console.error("Error checking admin:", err);
-        // Fallback to email check if Firestore check fails due to permissions
-        if (user.email === 'darajazb@gmail.com') {
-          setIsAdmin(true);
-        } else {
-          navigate('/');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAdmin();
-  }, [user, navigate]);
+    setLoading(false);
+  }, []);
+
+  const handleUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const masterPass = import.meta.env.VITE_ADMIN_PASSWORD || 'jkcabs2010';
+    if (pinInput === masterPass) {
+      await login(); // Sync with global AuthContext
+      setIsUnlocked(true);
+      setIsAdmin(true);
+      sessionStorage.setItem('admin_unlocked', 'true');
+      toast.success("Secure Portal Unlocked");
+    } else {
+      toast.error("Invalid Access Key");
+    }
+  };
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isUnlocked) return;
 
     const unsubFleet = onSnapshot(collection(db, 'fleet'), (snap) => {
       setFleet(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -167,7 +156,7 @@ export default function AdminPanel() {
       unsubUsers();
       unsubSettings();
     };
-  }, [isAdmin]);
+  }, [isUnlocked]);
 
   const handleWipeAllData = async () => {
     if (!confirm("CRITICAL ACTION: This will delete ALL data (Fleet, Rates, Drivers, Packages, Bookings) from your cloud storage. This cannot be undone. Are you sure?")) return;
@@ -189,24 +178,15 @@ export default function AdminPanel() {
 
   const handleSyncInitial = async () => {
     toast.promise(async () => {
-      // Self-promote current user if they are the primary admin email
-      if (user?.email === 'darajazb@gmail.com') {
-        await setDoc(doc(db, 'admins', user.uid), {
-          email: user.email,
-          role: 'admin',
-          updatedAt: serverTimestamp()
-        });
-      }
-      
       // Just sync settings if they don't exist
       const settingsSnap = await getDoc(doc(db, 'settings', 'site'));
       if (!settingsSnap.exists()) {
         await setDoc(doc(db, 'settings', 'site'), siteSettings);
       }
     }, {
-      loading: 'Syncing admin profile...',
-      success: 'Admin profile synced!',
-      error: 'Failed to sync profile.',
+      loading: 'Syncing system defaults...',
+      success: 'System defaults synced!',
+      error: 'Failed to sync defaults.',
     });
   };
   const handleDelete = async (col: string, id: string) => {
@@ -320,7 +300,44 @@ export default function AdminPanel() {
     );
   }
 
-  if (!isAdmin && user?.email !== 'darajazb@gmail.com') return null;
+  if (!isUnlocked) {
+    return (
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white p-6">
+        <Toaster position="top-center" richColors />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full bg-[#111] border border-white/5 rounded-[2.5rem] p-10 shadow-2xl"
+        >
+          <div className="flex justify-center mb-8">
+            <div className="w-16 h-16 bg-yellow-400 rounded-3xl flex items-center justify-center text-black shadow-lg shadow-yellow-400/20">
+              <ShieldCheck className="w-8 h-8" />
+            </div>
+          </div>
+          <h2 className="text-3xl font-black text-center uppercase tracking-tighter mb-2">Secure Access</h2>
+          <p className="text-center text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-8">Enter your master digital key</p>
+          
+          <form onSubmit={handleUnlock} className="space-y-6">
+            <div className="relative group">
+              <Input 
+                type="password" 
+                value={pinInput} 
+                onChange={(e) => setPinInput(e.target.value)}
+                placeholder="••••••••" 
+                className="h-16 bg-white/5 border-0 rounded-2xl text-center text-2xl font-black tracking-[0.5em] focus-visible:ring-2 focus-visible:ring-yellow-400/50"
+              />
+            </div>
+            <Button type="submit" className="w-full h-16 rounded-2xl bg-yellow-400 hover:bg-yellow-500 text-black font-black uppercase tracking-widest shadow-xl shadow-yellow-400/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
+              Decipher & Access
+            </Button>
+            <Button variant="ghost" onClick={() => navigate('/')} className="w-full h-12 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white">
+              Back to Home
+            </Button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-[#fafafa] dark:bg-[#0a0a0a] overflow-hidden font-sans">

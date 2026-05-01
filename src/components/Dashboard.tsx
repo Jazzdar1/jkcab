@@ -24,12 +24,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { db, logOut } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '@/lib/firebaseUtils';
 
 export default function Dashboard() {
-  const { user, profile, isAdmin } = useAuth();
+  const { user, profile, isAdmin, logout } = useAuth();
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'bookings' | 'admin'>('bookings');
   const [bookings, setBookings] = useState<any[]>([]);
@@ -39,24 +39,27 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && (!user || (!isAdmin && user.email !== 'darajazb@gmail.com'))) {
+    if (!loading && !user && !isAdmin) {
       navigate('/');
     }
   }, [user, isAdmin, loading, navigate]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user && !isAdmin) return;
 
     let q;
     const bookingsPath = 'bookings';
     if (isAdmin && activeTab === 'admin') {
       q = query(collection(db, bookingsPath), orderBy('createdAt', 'desc'));
-    } else {
+    } else if (user) {
       q = query(
         collection(db, bookingsPath), 
         where('userId', '==', user.uid),
         orderBy('createdAt', 'desc')
       );
+    } else {
+      setLoading(false);
+      return;
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -111,7 +114,7 @@ export default function Dashboard() {
     cancelled: bookings.filter(b => b.status === 'cancelled').length,
   };
 
-  if (!user || (!isAdmin && user.email !== 'darajazb@gmail.com')) return null;
+  if (!loading && !user && !isAdmin) return null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
@@ -162,7 +165,7 @@ export default function Dashboard() {
             </div>
           )}
           <button 
-            onClick={() => logOut()}
+            onClick={() => logout()}
             className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-red-500 hover:bg-red-50 transition-all group shadow-sm active:scale-90"
             title="Sign Out"
           >

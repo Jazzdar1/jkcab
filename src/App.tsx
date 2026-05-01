@@ -1,5 +1,3 @@
-import AdminLogin from '@/components/AdminLogin';
-import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -63,15 +61,6 @@ function BookingModal({ isOpen, onClose, initialData }: { isOpen: boolean, onClo
       )}
     </AnimatePresence>
   );
-}
-function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { loading, isAdmin } = useAuth();
-  if (loading) return null;
-  if (!isAdmin) {
-    window.location.href = '/admin-login';
-    return null;
-  }
-  return <>{children}</>;
 }
 
 function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => void }) {
@@ -304,8 +293,7 @@ function AppContent() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/vehicle/:id" element={<VehicleDetailsPage onBook={handleVehicleSelect} />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+        </Routes>
       </main>
       <Footer />
       <WhatsAppButton />
