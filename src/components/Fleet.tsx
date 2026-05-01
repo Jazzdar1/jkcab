@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, Info, LayoutGrid, ListFilter, Users, ArrowRight } from 'lucide-react';
-import { VEHICLES as FALLBACK_VEHICLES } from '../constants';
-import { Vehicle } from '../types';
-import { useLanguage } from '../context/LanguageContext';
-import { db } from '../lib/firebase';
+import { VEHICLES as FALLBACK_VEHICLES } from '@/constants';
+import { Vehicle } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
+import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { useSite } from '../context/SiteContext';
+import { useSite } from '@/context/SiteContext';
 
 interface FleetProps {
   onVehicleSelect?: (vehicleId: string, vehicleName: string) => void;

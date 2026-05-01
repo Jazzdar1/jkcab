@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Menu, X, Phone, Car, LayoutDashboard, LogIn, User as UserIcon, Globe, ChevronDown, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CONTACT_INFO } from '../constants';
-import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
-import { signInWithGoogle } from '../lib/firebase';
+import { CONTACT_INFO } from '@/constants';
+import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { signInWithGoogle } from '@/lib/firebase';
 import Logo from './Logo';
-import { useSite } from '../context/SiteContext';
+import { useSite } from '@/context/SiteContext';
 
 interface NavbarProps {
   onDashboardClick: () => void;

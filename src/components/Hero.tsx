@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, MapPin, Users, Car, ChevronRight, User, Phone } from 'lucide-react';
-import { VEHICLES, CONTACT_INFO } from '../constants';
-import { useLanguage } from '../context/LanguageContext';
-import { useSite } from '../context/SiteContext';
+import { VEHICLES, CONTACT_INFO } from '@/constants';
+import { useLanguage } from '@/context/LanguageContext';
+import { useSite } from '@/context/SiteContext';
 
 import BookingForm from './BookingForm';
 

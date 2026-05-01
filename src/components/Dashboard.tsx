@@ -22,11 +22,11 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
-import { db, logOut } from '../lib/firebase';
+import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { db, logOut } from '@/lib/firebase';
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
-import { handleFirestoreError, OperationType } from '../lib/firebaseUtils';
+import { handleFirestoreError, OperationType } from '@/lib/firebaseUtils';
 
 export default function Dashboard() {
   const { user, profile, isAdmin } = useAuth();

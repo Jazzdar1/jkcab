@@ -7,8 +7,8 @@ import {
   ShieldCheck, RefreshCw, Smartphone, Globe, Calendar, LayoutGrid
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { db } from '../lib/firebase';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
 import { 
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, 
   onSnapshot, query, orderBy, setDoc, serverTimestamp, getDoc 

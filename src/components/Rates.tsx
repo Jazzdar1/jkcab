@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, ArrowRight, Car } from 'lucide-react';
-import { ROUTE_RATES as FALLBACK_RATES } from '../constants';
-import { useLanguage } from '../context/LanguageContext';
-import { db } from '../lib/firebase';
+import { ROUTE_RATES as FALLBACK_RATES } from '@/constants';
+import { useLanguage } from '@/context/LanguageContext';
+import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { useSite } from '../context/SiteContext';
+import { useSite } from '@/context/SiteContext';
 
 interface RatesProps {
   onCustomInquiry?: () => void;
