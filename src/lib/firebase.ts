@@ -1,3 +1,11 @@
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  signOut,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
@@ -19,6 +27,8 @@ const app = initializeApp(config);
 export const db = getFirestore(app, config.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+export const signInAdminWithEmail = (email: string, password: string) =>
+  signInWithEmailAndPassword(auth, email, password);
 
 // Custom sign-in function using popup with locking and error handling
 let isSigningIn = false;
