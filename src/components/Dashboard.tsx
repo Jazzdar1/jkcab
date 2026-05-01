@@ -21,6 +21,7 @@ import {
   TrendingUp,
   AlertCircle
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { db, logOut } from '../lib/firebase';
@@ -35,6 +36,13 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && (!user || (!isAdmin && user.email !== 'darajazb@gmail.com'))) {
+      navigate('/');
+    }
+  }, [user, isAdmin, loading, navigate]);
 
   useEffect(() => {
     if (!user) return;
@@ -103,15 +111,7 @@ export default function Dashboard() {
     cancelled: bookings.filter(b => b.status === 'cancelled').length,
   };
 
-  if (!user) return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center max-w-lg mx-auto">
-       <div className="w-20 h-20 bg-yellow-50 rounded-[2rem] flex items-center justify-center mb-6 transform rotate-3">
-          <History className="h-10 w-10 text-yellow-500" />
-       </div>
-       <h2 className="text-3xl font-black text-gray-900 mb-4">Sign in required</h2>
-       <p className="text-gray-500 mb-8 font-medium">Track your trips, manage bookings and get personalized recommendations from Srinagar's best cab service.</p>
-    </div>
-  );
+  if (!user || (!isAdmin && user.email !== 'darajazb@gmail.com')) return null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">

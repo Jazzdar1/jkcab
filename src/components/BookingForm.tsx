@@ -166,25 +166,6 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
         await addDoc(collection(db, path), bookingData);
       } catch (error) {
         console.error("Firestore booking error:", error);
-        // We try to log it but don't stop the flow if Puter is used
-      }
-
-      // 2. Try Puter.js (as requested)
-      try {
-        if (window.puter) {
-          const puterData = {
-            ...bookingData,
-            createdAt: timestamp.toISOString(),
-            updatedAt: timestamp.toISOString(),
-          };
-          const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          await window.puter.kv.set(bookingId, JSON.stringify(puterData));
-          console.log("Booking saved to Puter.js KV store");
-        } else {
-          console.warn("Puter.js SDK not found on window");
-        }
-      } catch (puterError) {
-        console.error("Puter.js storage error:", puterError);
       }
 
       // Simulate Email Sending
@@ -204,15 +185,16 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
         `✨ *Features:* ${formData.features.length > 0 ? formData.features.map(f => t(`booking.${f}`)).join(', ') : 'None'}\n\n` +
         `_Requested via website inquiry form._`;
 
-      const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp.replace(/\+/g, '').replace(/\s/g, '')}?text=${encodeURIComponent(message)}`;
+      const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
       
+      setBookingRef(generatedId);
       setStep('success');
+
       if (onSuccess) onSuccess();
       
+      // Attempt immediate open, but also provide button on success screen
       if (formData.contactViaWhatsApp) {
-        setTimeout(() => {
-          window.open(whatsappUrl, '_blank');
-        }, 3000);
+        window.open(whatsappUrl, '_blank');
       }
 
     } catch (error) {
@@ -310,7 +292,7 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                         onChange={(e) => setFormData({...formData, passengers: e.target.value})}
                       >
                         {[1, 2, 3, 4, 5, 6, 7, 8, '8+'].map((num) => (
-                          <option key={num} value={num}>{num} Passengers</option>
+                          <option key={num} value={num} className="text-black bg-white">{num} Passengers</option>
                         ))}
                       </select>
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within/input:text-yellow-500">
@@ -592,7 +574,7 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                        <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mt-1">Vehicle</span>
                        <div className="flex flex-wrap justify-end gap-1">
                           {formData.vehicles.map((v, i) => (
-                            <span key={i} className="text-[9px] font-bold text-gray-700 dark:text-gray-300">
+                            <span key={`success-v-${i}`} className="text-[9px] font-bold text-gray-700 dark:text-gray-300">
                               {v}{i < formData.vehicles.length - 1 ? ',' : ''}
                             </span>
                           ))}
@@ -609,9 +591,31 @@ export default function BookingForm({ initialData, onSuccess }: BookingFormProps
                   </div>
                 </div>
 
-                <div className="p-5 bg-yellow-400/10 dark:bg-yellow-400/5 rounded-[1.5rem] inline-flex items-center space-x-4 border border-yellow-400/20">
-                   <div className="w-6 h-6 rounded-full border-2 border-yellow-400 border-t-transparent animate-spin"></div>
-                   <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest leading-none">{t('booking.whatsappRedirect')}</span>
+                <div className="space-y-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const message = `*NEW BOOKING REQUEST - JK CABS*\n\n` +
+                        `👤 *Customer:* ${formData.name}\n` +
+                        `📞 *Phone:* ${formData.phone}\n` +
+                        `📍 *From:* ${formData.pickup}\n` +
+                        `🏁 *To:* ${formData.dropoff}\n` +
+                        `📅 *Date:* ${formData.date}\n` +
+                        `👥 *Passengers:* ${formData.passengers}\n` +
+                        `🚗 *Vehicles:* ${formData.vehicles.join(', ')}\n\n` +
+                        `_Instant Confirmation Request via Website_`;
+                      const url = `https://wa.me/${CONTACT_INFO.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+                      window.open(url, '_blank');
+                    }}
+                    className="w-full bg-[#25D366] text-white py-5 rounded-[1.75rem] font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-3 transition-all transform active:scale-95 group shadow-2xl shadow-green-500/20"
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                    <span>Confirm on WhatsApp</span>
+                  </button>
+
+                  <div className="p-4 bg-yellow-400/10 dark:bg-yellow-400/5 rounded-[1.5rem] flex items-center justify-center space-x-4 border border-yellow-400/20">
+                    <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest leading-none">Redirecting to WhatsApp...</span>
+                  </div>
                 </div>
               </motion.div>
             ) : null}

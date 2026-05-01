@@ -10,6 +10,7 @@ import Packages from './components/Packages';
 import Features from './components/Features';
 import Drivers from './components/Drivers';
 import Testimonials from './components/Testimonials';
+import GoogleReviews from './components/GoogleReviews';
 import TravelGuide from './components/TravelGuide';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -77,9 +78,6 @@ function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => 
         const vehicleDoc = await getDoc(doc(db, 'fleet', id));
         if (vehicleDoc.exists()) {
           setVehicle(vehicleDoc.data());
-        } else {
-          const fallback = FALLBACK_VEHICLES.find(v => v.id === id);
-          if (fallback) setVehicle(fallback);
         }
       } catch (err) {
         console.error("Error fetching vehicle:", err);
@@ -245,6 +243,7 @@ function HomePage({ onVehicleSelect, onBulkInquiry, onPackageSelect, onCustomInq
       <Drivers />
       <Packages onPackageSelect={onPackageSelect} />
       <Testimonials />
+      <GoogleReviews />
       <TravelGuide />
     </>
   );

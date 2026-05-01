@@ -151,7 +151,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'settings', 'site'), (snap) => {
       if (snap.exists()) {
-        setSettings(snap.data() as SiteSettings);
+        setSettings({ ...defaultSettings, ...snap.data() } as SiteSettings);
       }
       setLoading(false);
     }, (err) => {

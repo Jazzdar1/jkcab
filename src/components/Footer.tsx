@@ -33,7 +33,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-6">
               {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                <span key={i} className="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center rounded-2xl text-gray-400 hover:text-yellow-400 hover:bg-white/10 transition-all cursor-pointer group shadow-2xl">
+                <span key={`social-${i}`} className="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center rounded-2xl text-gray-400 hover:text-yellow-400 hover:bg-white/10 transition-all cursor-pointer group shadow-2xl">
                   <Icon className="h-5 w-5 transform group-hover:scale-110 transition-transform" />
                 </span>
               ))}
@@ -50,7 +50,7 @@ export default function Footer() {
                 { name: settings.navPackages, id: 'tourpackages' },
                 { name: settings.navContact, id: 'contact' }
               ].map((item) => (
-                <li key={item.name}>
+                <li key={`footer-link-${item.id}`}>
                   <a href={`#${item.id}`} className="text-gray-500 text-sm hover:text-yellow-400 transition-all font-bold uppercase tracking-widest flex items-center group">
                     <span className="w-0 group-hover:w-4 h-[2px] bg-yellow-400 mr-0 group-hover:mr-3 transition-all duration-300"></span>
                     {item.name}
@@ -64,7 +64,7 @@ export default function Footer() {
             <h4 className="text-[10px] font-black text-white uppercase tracking-[0.4em] mb-10">Destinations</h4>
             <ul className="space-y-6">
               {['Srinagar Local', 'Gulmarg Trip', 'Pahalgam Trip', 'Sonamarg Day', 'Airport Trans'].map((item) => (
-                <li key={item}>
+                <li key={`dest-${item}`}>
                   <a href="#" className="text-gray-500 text-sm hover:text-yellow-400 transition-all font-bold uppercase tracking-widest flex items-center group">
                     <span className="w-0 group-hover:w-4 h-[2px] bg-yellow-400 mr-0 group-hover:mr-3 transition-all duration-300"></span>
                     {item}
@@ -118,7 +118,17 @@ export default function Footer() {
           </div>
           <div className="flex space-x-12">
             <a href="#" className="hover:text-yellow-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-yellow-400 transition-colors">Safety Terms</a>
+            <button 
+              onClick={async () => {
+                const { signInWithGoogle } = await import('../lib/firebase');
+                try {
+                  await signInWithGoogle();
+                } catch (e) {}
+              }}
+              className="hover:text-yellow-400 transition-colors cursor-pointer"
+            >
+              Admin Access
+            </button>
           </div>
         </div>
       </div>

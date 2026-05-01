@@ -83,7 +83,7 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
             }`}>
               {navLinks.map((link) => (
                 <a
-                  key={link.name}
+                  key={link.href}
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link)}
                   className={`text-[11px] font-black uppercase tracking-[0.2em] px-5 py-2.5 rounded-full transition-all hover:bg-yellow-400 hover:text-black ${
@@ -151,49 +151,31 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
               </div>
 
               {loading ? (
-                <div className="h-10 w-40 rounded-2xl bg-gray-100 animate-pulse"></div>
-              ) : user ? (
+                <div className="h-10 w-10 rounded-2xl bg-gray-100 animate-pulse"></div>
+              ) : user && isAdmin ? (
                 <div className="flex items-center space-x-2">
-                  {isAdmin && (
-                    <button
-                      onClick={() => navigate('/admin')}
-                      className={`flex items-center px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                        location.pathname === '/admin'
-                          ? 'bg-red-500 text-white'
-                          : 'bg-white text-red-500 border border-red-100 hover:bg-red-50'
-                      }`}
-                    >
-                      <Settings className="h-3.5 w-3.5 mr-2" />
-                      Admin
-                    </button>
-                  )}
                   <button
-                    onClick={onDashboardClick}
+                    onClick={() => navigate('/admin')}
+                    className={`flex items-center px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      location.pathname === '/admin'
+                        ? 'bg-red-500 text-white'
+                        : 'bg-white text-red-500 border border-red-200 hover:bg-red-50'
+                    }`}
+                  >
+                    <Settings className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => navigate('/dashboard')}
                     className={`flex items-center px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
                       isDashboard 
                         ? 'bg-black text-white' 
-                        : 'bg-white text-black border border-gray-100 hover:border-yellow-400 hover:shadow-xl hover:shadow-yellow-400/10'
+                        : 'bg-white text-black border border-gray-200 hover:border-yellow-400'
                     }`}
                   >
-                    <LayoutDashboard className="h-3.5 w-3.5 mr-2" />
-                    {settings.navDashboard}
+                    <LayoutDashboard className="h-3.5 w-3.5" />
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={async () => {
-                    try {
-                      await signInWithGoogle();
-                    } catch (error) {
-                      // Error is handled in lib/firebase.ts
-                    }
-                  }}
-                  className="flex items-center bg-yellow-400 text-black px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:shadow-2xl hover:shadow-yellow-400/20 transition-all shadow-xl group/login"
-                >
-                  <LogIn className="h-3.5 w-3.5 mr-2 group-hover/login:scale-110 transition-transform" />
-                  {settings.navSignIn}
-                </button>
-              )}
+              ) : null}
               
               <a
                 href={`tel:${settings.contactPhone}`}
@@ -255,7 +237,7 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
             <div className="space-y-6 flex-1 overflow-y-auto">
               {navLinks.map((link) => (
                 <a
-                  key={link.name}
+                  key={`${link.href}-mobile`}
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link)}
                   className="block text-3xl font-black text-gray-900 dark:text-white hover:text-yellow-500 transition-colors"
@@ -264,17 +246,15 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
                 </a>
               ))}
               
-              {user ? (
-                <div className="space-y-4">
-                  {isAdmin && (
-                    <button
-                      onClick={() => { navigate('/admin'); setIsOpen(false); }}
-                      className="flex items-center w-full p-4 bg-red-50 dark:bg-red-500/10 rounded-2xl text-xl font-bold text-red-600"
-                    >
-                      <Settings className="h-6 w-6 mr-4" />
-                      Admin Panel
-                    </button>
-                  )}
+              {user && isAdmin && (
+                <div className="space-y-4 pt-8 border-t border-gray-100 dark:border-white/10">
+                  <button
+                    onClick={() => { navigate('/admin'); setIsOpen(false); }}
+                    className="flex items-center w-full p-4 bg-red-50 dark:bg-red-500/10 rounded-2xl text-xl font-bold text-red-600"
+                  >
+                    <Settings className="h-6 w-6 mr-4" />
+                    Admin Panel
+                  </button>
                   <button
                     onClick={() => { navigate('/dashboard'); setIsOpen(false); }}
                     className="flex items-center w-full p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-xl font-bold text-gray-900 dark:text-white"
@@ -283,21 +263,6 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
                     {settings.navDashboard}
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={async () => {
-                    try {
-                      await signInWithGoogle();
-                      setIsOpen(false);
-                    } catch (error) {
-                      // Error is handled in lib/firebase.ts
-                    }
-                  }}
-                  className="flex items-center w-full p-4 bg-yellow-400 rounded-2xl text-xl font-bold text-black"
-                >
-                  <LogIn className="h-6 w-6 mr-4" />
-                  {settings.navSignIn}
-                </button>
               )}
             </div>
 

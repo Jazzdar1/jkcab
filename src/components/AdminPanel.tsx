@@ -11,7 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { 
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, 
-  onSnapshot, query, orderBy, setDoc, serverTimestamp 
+  onSnapshot, query, orderBy, setDoc, serverTimestamp, getDoc 
 } from 'firebase/firestore';
 import { VEHICLES, DRIVERS, ROUTE_RATES, TOUR_PACKAGES } from '../constants';
 
@@ -108,7 +108,7 @@ export default function AdminPanel() {
         if (isAdminUser || user.email === 'darajazb@gmail.com') {
           setIsAdmin(true);
         } else {
-          navigate('/dashboard');
+          navigate('/');
         }
       } catch (err) {
         console.error("Error checking admin:", err);
@@ -116,7 +116,7 @@ export default function AdminPanel() {
         if (user.email === 'darajazb@gmail.com') {
           setIsAdmin(true);
         } else {
-          navigate('/dashboard');
+          navigate('/');
         }
       } finally {
         setLoading(false);
@@ -198,71 +198,17 @@ export default function AdminPanel() {
         });
       }
       
-      for (const v of VEHICLES) {
-        await setDoc(doc(db, 'fleet', v.id), { ...v, updatedAt: serverTimestamp() });
+      // Just sync settings if they don't exist
+      const settingsSnap = await getDoc(doc(db, 'settings', 'site'));
+      if (!settingsSnap.exists()) {
+        await setDoc(doc(db, 'settings', 'site'), siteSettings);
       }
-      for (const d of DRIVERS) {
-        await setDoc(doc(db, 'drivers', d.id), { ...d });
-      }
-      for (let i = 0; i < ROUTE_RATES.length; i++) {
-        const r = ROUTE_RATES[i];
-        await setDoc(doc(db, 'rates', `rate_${i}`), { ...r });
-      }
-      for (const p of TOUR_PACKAGES) {
-        await setDoc(doc(db, 'packages', p.id), { ...p });
-      }
-
-      await setDoc(doc(db, 'settings', 'site'), {
-        logoLine1: 'J&K',
-        logoLine2: 'CABS',
-        logoTagline: 'EST. 2010',
-        heroTitle: 'Luxury Travel Redefined',
-        heroSubtitle: 'Experience the pinnacle of chauffeured travel with our elite fleet and professional crew.',
-        heroBadge: 'Premium Chauffeur Service',
-        heroImage: 'https://images.unsplash.com/photo-1598305310232-a764dca2161b?q=80&w=2070&auto=format&fit=crop',
-        heroStatsRating: '4.9',
-        heroStatsLabel: 'Verified Srinagar Reviews',
-        heroClientsCount: '+2k Happy Clients',
-        heroScrollLabel: 'Discover Kashmir',
-        fleetTitle: 'Premium Fleet',
-        fleetSubtitle: 'Select Your Companion',
-        fleetSectionLabel: 'Section 01',
-        ratesTitle: 'Live Route Estimates',
-        ratesSubtitle: 'Transparent Pricing',
-        ratesSectionLabel: 'Section 02',
-        packagesTitle: 'Curated Journeys',
-        packagesSubtitle: 'Experience the Magic',
-        packagesSectionLabel: 'Section 03',
-        packagesDescription: 'Hand-picked experiences designed for comfort, discovery, and unforgettable memories in the heart of the Himalayas.',
-        contactEmail: 'contact@daraz.com',
-        contactPhone: '+91 99999 99999',
-        footerText: '© 2024 Daraz Luxe. Excellence in Motion.',
-        address: 'Executive Suites, MG Road, Bangalore',
-        featuresTitle: 'A Service Built on',
-        featuresSubtitle: 'Trust & Experience',
-        featuresSectionLabel: 'Why Us',
-        highlights: [
-          { title: 'Reliable Service', desc: 'We pride ourselves on punctuality and high safety standards for every client.' },
-          { title: 'No Hidden Costs', desc: 'Transparent pricing from the start. What we quote is what you pay.' },
-          { title: 'Local Experts', desc: 'Our drivers are born and raised in Kashmir, knowing every hidden gem.' },
-          { title: 'Real-time Tracking', desc: 'Stay informed with live driver tracking and instant WhatsApp updates.' }
-        ],
-        customFleetTitle: 'Need a custom fleet for an event?',
-        customFleetDesc: 'We provide bulk bookings for weddings, corporate events, and large group tours across Jammu & Kashmir.',
-        customFleetButton: 'Bulk Inquiry',
-        labelPerDay: 'Per Day Rate',
-        labelStartsAt: 'Package Starts At',
-        labelBookingTitle: 'Secure Your Journey',
-        labelBookingSubtitle: 'Complete the form below to receive a direct quote and availability status for your selected vehicle.',
-        updatedAt: serverTimestamp()
-      });
     }, {
-      loading: 'Syncing cloud data...',
-      success: 'Data synced successfully!',
-      error: 'Failed to sync data.',
+      loading: 'Syncing admin profile...',
+      success: 'Admin profile synced!',
+      error: 'Failed to sync profile.',
     });
   };
-
   const handleDelete = async (col: string, id: string) => {
     if (!confirm("Are you sure you want to delete this item?")) return;
     try {
@@ -432,7 +378,7 @@ export default function AdminPanel() {
             className="w-full justify-start space-x-3 h-14 rounded-2xl text-[10px] uppercase font-black tracking-widest border-dashed border-gray-200 dark:border-white/10 hover:bg-yellow-400/5 hover:border-yellow-400/30"
           >
             <RefreshCw className="h-4 w-4 text-yellow-500" />
-            <span>Sync Cloud</span>
+            <span>Sync Admin</span>
           </Button>
           <Button 
             variant="ghost" 
@@ -495,7 +441,7 @@ export default function AdminPanel() {
                     className="bg-yellow-400 text-black h-16 px-10 rounded-[2rem] text-[10px] font-black uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all"
                   >
                     <RefreshCw className="h-4 w-4 mr-3" />
-                    Reset to Defaults
+                    Sync Admin
                   </Button>
                   <Button 
                     onClick={handleWipeAllData}
@@ -507,14 +453,16 @@ export default function AdminPanel() {
                 </div>
               ) : activeTab !== 'bookings' && activeTab !== 'users' && (
                 <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      onClick={() => { setEditingItem(null); setIsEditDialogOpen(true); }}
-                      className="bg-black dark:bg-white text-white dark:text-black h-16 px-10 rounded-[2rem] text-[10px] font-black uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all"
-                    >
-                      <Plus className="h-4 w-4 mr-3" />
-                      Add {activeTab === 'fleet' ? 'Vehicle' : activeTab.slice(0, -1)}
-                    </Button>
+                  <DialogTrigger 
+                    render={
+                      <Button 
+                        onClick={() => { setEditingItem(null); setIsEditDialogOpen(true); }}
+                        className="bg-black dark:bg-white text-white dark:text-black h-16 px-10 rounded-[2rem] text-[10px] font-black uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all"
+                      />
+                    }
+                  >
+                    <Plus className="h-4 w-4 mr-3" />
+                    Add {activeTab === 'fleet' ? 'Vehicle' : activeTab.slice(0, -1)}
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl bg-white dark:bg-[#111] border-0 rounded-[3rem] shadow-2xl p-10 overflow-y-auto max-h-[90vh]">
                     <DialogHeader className="mb-8">
