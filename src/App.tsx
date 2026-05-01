@@ -64,6 +64,15 @@ function BookingModal({ isOpen, onClose, initialData }: { isOpen: boolean, onClo
     </AnimatePresence>
   );
 }
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { loading, isAdmin } = useAuth();
+  if (loading) return null;
+  if (!isAdmin) {
+    window.location.href = '/admin-login';
+    return null;
+  }
+  return <>{children}</>;
+}
 
 function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => void }) {
   const { id } = useParams();
