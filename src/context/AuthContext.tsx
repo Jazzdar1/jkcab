@@ -23,38 +23,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
-      if (user) {
-        // Sync user profile
+
+      if (!user) {
+        setProfile(null);
+        setIsAdmin(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
         const userDocRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        
+        const adminDocRef = doc(db, 'admins', user.uid);
+
+        const [userDoc, adminDoc] = await Promise.all([
+          getDoc(userDocRef),
+          getDoc(adminDocRef),
+        ]);
+
+        let profileData: any = null;
+
         if (!userDoc.exists()) {
-          const newProfile = {
+          profileData = {
             email: user.email,
             name: user.displayName || 'Customer',
             role: 'customer',
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
           };
-          await setDoc(userDocRef, newProfile);
-          setProfile(newProfile);
+          await setDoc(userDocRef, profileData);
         } else {
-          setProfile(userDoc.data());
+          profileData = userDoc.data();
         }
-      } else {
-        setProfile(null);
+
+        setProfile(profileData);
+
+        const adminByRole = profileData?.role === 'admin';
+        const adminByCollection = adminDoc.exists();
+        const adminByEmail = user.email === 'darajazb@gmail.com';
+
+        setIsAdmin(Boolean(adminByRole || adminByCollection || adminByEmail));
+      } catch (err) {
+        console.error('AuthContext admin check error:', err);
+        setIsAdmin(user.email === 'darajazb@gmail.com');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return unsubscribe;
   }, []);
-
-  const isAdmin = profile?.role === 'admin' || user?.email === 'darajazb@gmail.com';
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, isAdmin }}>
