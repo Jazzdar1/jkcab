@@ -8,6 +8,7 @@ interface AuthContextType {
   profile: any | null;
   loading: boolean;
   isAdmin: boolean;
+  refreshAdminStatus: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   isAdmin: false,
+  refreshAdminStatus: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -25,11 +27,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
+  const resolveAdminStatus = async (uid: string, profileData?: any) => {
+    const [adminDoc, userDoc] = await Promise.all([
+      getDoc(doc(db, 'admins', uid)),
+      profileData ? Promise.resolve({ exists: () => true, data: () => profileData }) : getDoc(doc(db, 'users', uid)),
+    ]);
 
-      if (!user) {
+    const role = userDoc.exists() ? userDoc.data()?.role : undefined;
+    return adminDoc.exists() || role === 'admin';
+  };
+
+  const refreshAdminStatus = async () => {
+    if (!auth.currentUser) {
+      setIsAdmin(false);
+      return;
+    }
+    try {
+      const status = await resolveAdminStatus(auth.currentUser.uid);
+      setIsAdmin(status);
+    } catch (e) {
+      console.error('Failed to refresh admin status:', e);
+      setIsAdmin(false);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+
+      if (!currentUser) {
         setProfile(null);
         setIsAdmin(false);
         setLoading(false);
@@ -37,20 +63,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        const userDocRef = doc(db, 'users', user.uid);
-        const adminDocRef = doc(db, 'admins', user.uid);
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
 
-        const [userDoc, adminDoc] = await Promise.all([
-          getDoc(userDocRef),
-          getDoc(adminDocRef),
-        ]);
-
-        let profileData: any = null;
-
+        let profileData: any;
         if (!userDoc.exists()) {
           profileData = {
-            email: user.email,
-            name: user.displayName || 'Customer',
+            email: currentUser.email,
+            name: currentUser.displayName || 'Customer',
             role: 'customer',
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
@@ -62,14 +82,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setProfile(profileData);
 
-        const adminByRole = profileData?.role === 'admin';
-        const adminByCollection = adminDoc.exists();
-        const adminByEmail = user.email === 'darajazb@gmail.com';
-
-        setIsAdmin(Boolean(adminByRole || adminByCollection || adminByEmail));
+        const adminStatus = await resolveAdminStatus(currentUser.uid, profileData);
+        setIsAdmin(adminStatus);
       } catch (err) {
-        console.error('AuthContext admin check error:', err);
-        setIsAdmin(user.email === 'darajazb@gmail.com');
+        console.error('Auth bootstrap failed:', err);
+        setIsAdmin(false);
       } finally {
         setLoading(false);
       }
@@ -79,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAdmin }}>
+    <AuthContext.Provider value={{ user, profile, loading, isAdmin, refreshAdminStatus }}>
       {children}
     </AuthContext.Provider>
   );
