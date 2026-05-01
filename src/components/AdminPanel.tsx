@@ -16,15 +16,15 @@ import {
 import { VEHICLES, DRIVERS, ROUTE_RATES, TOUR_PACKAGES } from '../constants';
 
 // shadcn UI Components
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Toaster } from "@/components/ui/sonner";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "./ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { ScrollArea } from "./ui/scroll-area";
+import { Toaster } from "./ui/sonner";
 import { toast } from "sonner";
 
 export default function AdminPanel() {
@@ -61,10 +61,10 @@ export default function AdminPanel() {
     ratesSubtitle: 'Transparent Pricing',
     packagesTitle: 'Curated Journeys',
     packagesSubtitle: 'Experience the Magic',
-    contactEmail: 'contact@daraz.com',
-    contactPhone: '+91 99999 99999',
-    footerText: '© 2024 Daraz Luxe. Excellence in Motion.',
-    address: 'Executive Suites, MG Road, Bangalore',
+    contactEmail: 'booking@jandkcabs.in',
+    contactPhone: '+91 70062 68328',
+    footerText: '© 2024 J&K CABS. Excellence in Motion.',
+    address: 'Srinagar, Jammu & Kashmir, India',
     featuresTitle: 'A Service Built on',
     featuresSubtitle: 'Trust & Experience',
     highlights: []
