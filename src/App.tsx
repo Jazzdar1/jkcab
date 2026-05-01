@@ -242,8 +242,8 @@ function HomePage({ onVehicleSelect, onBulkInquiry, onPackageSelect, onCustomInq
       <Features />
       <Drivers />
       <Packages onPackageSelect={onPackageSelect} />
-      <Testimonials />
       <GoogleReviews />
+      <Testimonials />
       <TravelGuide />
     </>
   );

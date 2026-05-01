@@ -114,6 +114,15 @@ export const TOUR_PACKAGES: TourPackage[] = [
     image: 'https://images.unsplash.com/photo-1628108422476-80517724ec56?auto=format&fit=crop&q=80&w=800',
     description: 'Curated for romance with candle-light stays and serene lake moments.',
   },
+  {
+    id: 'pkg-7',
+    title: 'Winter Wonderland',
+    duration: '5 Days / 4 Nights',
+    price: 'Starting from ₹16,500',
+    destinations: ['Srinagar', 'Gulmarg (Snow Experience)', 'Pahalgam'],
+    image: 'https://images.unsplash.com/photo-1594833446077-96a92829ec95?auto=format&fit=crop&q=80&w=800',
+    description: 'Experience the magic of Kashmiri winter with skiing in Gulmarg and snow-covered pines.',
+  },
 ];
 
 export const ROUTE_RATES = [
