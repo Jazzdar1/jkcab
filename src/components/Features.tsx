@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ShieldCheck, Clock, ShieldAlert, Award, Star, ThumbsUp } from 'lucide-react';
-import { useSite } from '../context/SiteContext';
+import { useSite } from '@/context/SiteContext';
 
 export default function Features() {
   const { settings } = useSite();

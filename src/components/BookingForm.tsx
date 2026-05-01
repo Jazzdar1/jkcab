@@ -18,13 +18,13 @@ import {
   MessageSquare,
   AtSign
 } from 'lucide-react';
-import { VEHICLES, CONTACT_INFO } from '../constants';
-import { db } from '../lib/firebase';
+import { VEHICLES, CONTACT_INFO } from '@/constants';
+import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
-import { handleFirestoreError, OperationType } from '../lib/firebaseUtils';
-import { useSite } from '../context/SiteContext';
+import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { handleFirestoreError, OperationType } from '@/lib/firebaseUtils';
+import { useSite } from '@/context/SiteContext';
 
 declare global {
   interface Window {

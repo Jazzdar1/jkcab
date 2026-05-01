@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Star, ShieldCheck, Languages, Award } from 'lucide-react';
-import { DRIVERS as FALLBACK_DRIVERS } from '../constants';
-import { db } from '../lib/firebase';
+import { DRIVERS as FALLBACK_DRIVERS } from '@/constants';
+import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 
 export default function Drivers() {

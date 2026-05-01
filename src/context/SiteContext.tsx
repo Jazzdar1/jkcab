@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { db } from '../lib/firebase';
+import { db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 interface Highlight {
@@ -95,10 +95,10 @@ const defaultSettings: SiteSettings = {
   packagesSubtitle: 'Experience the Magic',
   packagesSectionLabel: 'Section 03',
   packagesDescription: 'Hand-picked experiences designed for comfort, discovery, and unforgettable memories in the heart of the Himalayas.',
-  contactEmail: 'booking@jandkcabs.in',
-  contactPhone: '+91 70062 68328',
-  footerText: '© 2024 J&K CABS. Excellence in Motion.',
-  address: 'Srinagar, Jammu & Kashmir, India',
+  contactEmail: 'contact@daraz.com',
+  contactPhone: '+91 99999 99999',
+  footerText: '© 2024 Daraz Luxe. Excellence in Motion.',
+  address: 'Executive Suites, MG Road, Bangalore',
   featuresTitle: 'A Service Built on',
   featuresSubtitle: 'Trust & Experience',
   featuresSectionLabel: 'Why Us',

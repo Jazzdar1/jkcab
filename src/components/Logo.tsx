@@ -1,6 +1,6 @@
 import React from 'react';
 import { Car, Mountain } from 'lucide-react';
-import { useSite } from '../context/SiteContext';
+import { useSite } from '@/context/SiteContext';
 
 interface LogoProps {
   scrolled?: boolean;

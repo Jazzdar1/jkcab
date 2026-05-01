@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Clock, MapPin, ArrowRight } from 'lucide-react';
-import { TOUR_PACKAGES as FALLBACK_PACKAGES } from '../constants';
-import { useLanguage } from '../context/LanguageContext';
-import { db } from '../lib/firebase';
+import { TOUR_PACKAGES as FALLBACK_PACKAGES } from '@/constants';
+import { useLanguage } from '@/context/LanguageContext';
+import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { useSite } from '../context/SiteContext';
+import { useSite } from '@/context/SiteContext';
 
 interface PackagesProps {
   onPackageSelect?: (pkgName: string) => void;

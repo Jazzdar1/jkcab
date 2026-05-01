@@ -1,8 +1,8 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, Car, Mountain } from 'lucide-react';
-import { CONTACT_INFO } from '../constants';
+import { CONTACT_INFO } from '@/constants';
 import Logo from './Logo';
-import { useSite } from '../context/SiteContext';
+import { useSite } from '@/context/SiteContext';
 
 export default function Footer() {
   const { settings } = useSite();
@@ -120,7 +120,7 @@ export default function Footer() {
             <a href="#" className="hover:text-yellow-400 transition-colors">Privacy Policy</a>
             <button 
               onClick={async () => {
-                const { signInWithGoogle } = await import('../lib/firebase');
+                const { signInWithGoogle } = await import('@/lib/firebase');
                 try {
                   await signInWithGoogle();
                 } catch (e) {}
