@@ -2,19 +2,24 @@ import React from 'react';
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, Car, Mountain } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
 import Logo from './Logo';
+import { useSite } from '../context/SiteContext';
 
 export default function Footer() {
+  const { settings } = useSite();
   return (
-    <footer id="contact" className="bg-[#0a0a0a] pt-32 pb-16 relative overflow-hidden">
+    <footer id="contact" className="bg-[#0a0a0a] pt-32 pb-16 relative overflow-hidden z-0">
       {/* Background decoration */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-400/5 rounded-full blur-[120px]"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-400/5 rounded-full blur-[120px] -z-10"></div>
       
       {/* Animated Vehicle Section */}
-      <div className="absolute top-0 left-0 w-full h-16 pointer-events-none overflow-hidden z-20 flex items-center">
-        <div className="w-full animate-drive flex items-center pl-4">
-            <div className="flex items-center space-x-2 bg-yellow-400 px-4 py-1.5 rounded-full scale-75 md:scale-90 shadow-[0_0_30px_rgba(250,204,21,0.5)] border-2 border-white">
-               <Car className="h-4 w-4 text-black" />
-               <span className="text-[9px] font-black text-black uppercase tracking-widest whitespace-nowrap">J&K CABS - Est. 2010</span>
+      <div className="h-24 w-full pointer-events-none overflow-hidden flex items-center mb-8">
+        <div className="animate-drive flex items-center">
+            <div className="flex items-center space-x-3 bg-yellow-400 px-6 py-2.5 rounded-full shadow-[0_0_50px_rgba(250,204,21,0.6)] border-2 border-white transform scale-110 md:scale-125">
+               <Car className="h-5 w-5 text-black" />
+               <div className="flex flex-col leading-none">
+                 <span className="text-[10px] font-black text-black uppercase tracking-widest whitespace-nowrap">J&K CABS</span>
+                 <span className="text-[7px] font-bold text-black/60 uppercase tracking-tighter">Premium Service</span>
+               </div>
             </div>
         </div>
       </div>
@@ -38,11 +43,17 @@ export default function Footer() {
           <div className="lg:col-span-2 lg:ml-auto">
             <h4 className="text-[10px] font-black text-white uppercase tracking-[0.4em] mb-10">Quick Links</h4>
             <ul className="space-y-6">
-              {['Home', 'Our Fleet', 'Rates', 'Tour Packages', 'Contact Us'].map((item) => (
-                <li key={item}>
-                  <a href={`#${item.toLowerCase().replace(' ', '')}`} className="text-gray-500 text-sm hover:text-yellow-400 transition-all font-bold uppercase tracking-widest flex items-center group">
+              {[
+                { name: settings.navHome, id: '' },
+                { name: settings.navFleet, id: 'fleet' },
+                { name: settings.navRates, id: 'rates' },
+                { name: settings.navPackages, id: 'tourpackages' },
+                { name: settings.navContact, id: 'contact' }
+              ].map((item) => (
+                <li key={item.name}>
+                  <a href={`#${item.id}`} className="text-gray-500 text-sm hover:text-yellow-400 transition-all font-bold uppercase tracking-widest flex items-center group">
                     <span className="w-0 group-hover:w-4 h-[2px] bg-yellow-400 mr-0 group-hover:mr-3 transition-all duration-300"></span>
-                    {item}
+                    {item.name}
                   </a>
                 </li>
               ))}
@@ -74,7 +85,7 @@ export default function Footer() {
                 </div>
                 <div>
                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5 leading-none">Office Address</p>
-                   <p className="text-sm text-gray-300 font-bold leading-relaxed">{CONTACT_INFO.address}</p>
+                   <p className="text-sm text-gray-300 font-bold leading-relaxed">{settings.address}</p>
                 </div>
               </div>
 
@@ -84,7 +95,7 @@ export default function Footer() {
                 </div>
                 <div>
                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5 leading-none">24/7 Helpline</p>
-                   <p className="text-lg text-white font-black tracking-tighter">{CONTACT_INFO.phone}</p>
+                   <p className="text-lg text-white font-black tracking-tighter">{settings.contactPhone}</p>
                 </div>
               </div>
 
@@ -94,7 +105,7 @@ export default function Footer() {
                 </div>
                 <div>
                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5 leading-none">Email Support</p>
-                   <p className="text-sm text-gray-300 font-bold">{CONTACT_INFO.email}</p>
+                   <p className="text-sm text-gray-300 font-bold">{settings.contactEmail}</p>
                 </div>
               </div>
             </div>
@@ -103,9 +114,7 @@ export default function Footer() {
 
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-600 font-black uppercase tracking-[0.4em] gap-8">
           <div className="flex items-center space-x-4">
-             <span>© 2026 J&K CABS.</span>
-             <span className="text-gray-800">|</span>
-             <span>Crafted in Srinagar</span>
+             <span>{settings.footerText}</span>
           </div>
           <div className="flex space-x-12">
             <a href="#" className="hover:text-yellow-400 transition-colors">Privacy Policy</a>

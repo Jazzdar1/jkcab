@@ -31,7 +31,7 @@
           "type": "array",
           "items": { "type": "string" }
         },
-        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled", "completed"] },
         "contactPreferences": {
           "type": "object",
           "properties": {
@@ -43,6 +43,61 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["customerName", "customerPhone", "pickup", "dropoff", "date", "passengers", "vehicle", "status", "createdAt", "updatedAt"]
+    },
+    "Vehicle": {
+      "title": "Vehicle",
+      "description": "Car details for fleet",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["Sedan", "SUV", "Luxury", "Large Group"] },
+        "capacity": { "type": "string" },
+        "pricePerDay": { "type": "string" },
+        "image": { "type": "string" },
+        "features": { "type": "array", "items": { "type": "string" } },
+        "isPremium": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "type", "capacity", "pricePerDay", "image"]
+    },
+    "Driver": {
+      "title": "Driver",
+      "description": "Driver profile",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "experience": { "type": "string" },
+        "rating": { "type": "number" },
+        "image": { "type": "string" },
+        "languages": { "type": "array", "items": { "type": "string" } },
+        "specialty": { "type": "string" }
+      },
+      "required": ["name", "experience", "rating", "image"]
+    },
+    "TourPackage": {
+      "title": "Tour Package",
+      "description": "Kashmir tour package",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "duration": { "type": "string" },
+        "price": { "type": "string" },
+        "destinations": { "type": "array", "items": { "type": "string" } },
+        "image": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["title", "duration", "price", "image"]
+    },
+    "Rate": {
+      "title": "Route Rate",
+      "description": "Pricing for specific routes",
+      "type": "object",
+      "properties": {
+        "route": { "type": "string" },
+        "sedan": { "type": "string" },
+        "suv": { "type": "string" }
+      },
+      "required": ["route", "sedan", "suv"]
     }
   },
   "firestore": {
@@ -53,6 +108,26 @@
     "/bookings/{bookingId}": {
       "schema": "Booking",
       "description": "All booking requests"
+    },
+    "/fleet/{vehicleId}": {
+      "schema": "Vehicle",
+      "description": "Cars in fleet"
+    },
+    "/drivers/{driverId}": {
+      "schema": "Driver",
+      "description": "Professional drivers"
+    },
+    "/packages/{packageId}": {
+      "schema": "TourPackage",
+      "description": "Tour packages"
+    },
+    "/rates/{rateId}": {
+      "schema": "Rate",
+      "description": "Pricing table"
+    },
+    "/admins/{adminId}": {
+      "schema": "User",
+      "description": "Administrator accounts"
     }
   }
 }

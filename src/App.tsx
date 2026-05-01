@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ArrowLeft, Users, Check, ShieldCheck, Star, Calendar, MessageSquare, MapPin } from 'lucide-react';
@@ -14,11 +14,16 @@ import TravelGuide from './components/TravelGuide';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import Dashboard from './components/Dashboard';
+import AdminPanel from './components/AdminPanel';
 import BookingForm from './components/BookingForm';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
-import { VEHICLES } from './constants';
+import { SiteProvider } from './context/SiteContext';
+import { VEHICLES as FALLBACK_VEHICLES } from './constants';
 import { useLanguage } from './context/LanguageContext';
+import { useSite } from './context/SiteContext';
+import { db } from './lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 function BookingModal({ isOpen, onClose, initialData }: { isOpen: boolean, onClose: () => void, initialData?: any }) {
   return (
@@ -57,11 +62,41 @@ function BookingModal({ isOpen, onClose, initialData }: { isOpen: boolean, onClo
   );
 }
 
-function VehicleDetailsPage({ onBook }: { onBook: (vehicleName: string) => void }) {
+function VehicleDetailsPage({ onBook }: { onBook: (id: string, name: string) => void }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const vehicle = VEHICLES.find(v => v.id === id);
+  const { settings } = useSite();
+  const [vehicle, setVehicle] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      if (!id) return;
+      try {
+        const vehicleDoc = await getDoc(doc(db, 'fleet', id));
+        if (vehicleDoc.exists()) {
+          setVehicle(vehicleDoc.data());
+        } else {
+          const fallback = FALLBACK_VEHICLES.find(v => v.id === id);
+          if (fallback) setVehicle(fallback);
+        }
+      } catch (err) {
+        console.error("Error fetching vehicle:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVehicle();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent animate-spin rounded-full"></div>
+      </div>
+    );
+  }
 
   if (!vehicle) {
     return (
@@ -87,7 +122,7 @@ function VehicleDetailsPage({ onBook }: { onBook: (vehicleName: string) => void 
         <div className="p-2 bg-gray-100 dark:bg-white/5 rounded-xl group-hover:bg-yellow-400 group-hover:text-black transition-all">
           <ArrowLeft className="h-4 w-4" />
         </div>
-        <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t('booking.back')}</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.3em]">{settings.labelBookingBack}</span>
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
@@ -128,7 +163,7 @@ function VehicleDetailsPage({ onBook }: { onBook: (vehicleName: string) => void 
                   <Users className="h-5 w-5 text-yellow-600" />
                 </div>
                 <div>
-                  <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Capacity</div>
+                  <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{settings.labelCapacity}</div>
                   <div className="text-sm font-black text-gray-900 dark:text-white uppercase">{vehicle.capacity}</div>
                 </div>
               </div>
@@ -137,7 +172,7 @@ function VehicleDetailsPage({ onBook }: { onBook: (vehicleName: string) => void 
                   <Star className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Pricing</div>
+                  <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{settings.labelPricing}</div>
                   <div className="text-sm font-black text-gray-900 dark:text-white uppercase">{vehicle.pricePerDay} <span className="text-[10px] text-gray-400">/ Day</span></div>
                 </div>
               </div>
@@ -172,10 +207,10 @@ function VehicleDetailsPage({ onBook }: { onBook: (vehicleName: string) => void 
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button 
-              onClick={() => onBook(vehicle.name)}
+              onClick={() => onBook(id!, vehicle.name)}
               className="flex-[2] bg-yellow-400 text-black h-20 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-yellow-400/20 hover:bg-black hover:text-white transition-all transform active:scale-95 flex items-center justify-center"
             >
-              Book This Vehicle Now
+              {settings.labelBookNow}
             </button>
             <a 
               href="https://wa.me/917006268328"
@@ -184,12 +219,12 @@ function VehicleDetailsPage({ onBook }: { onBook: (vehicleName: string) => void 
               className="flex-1 bg-white dark:bg-white/5 text-gray-900 dark:text-white h-20 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] border border-gray-200 dark:border-white/10 flex items-center justify-center space-x-2 hover:bg-gray-50 dark:hover:bg-white/10 transition-all"
             >
               <MessageSquare className="h-4 w-4" />
-              <span>Inquire</span>
+              <span>{settings.labelInquire}</span>
             </a>
           </div>
           
           <p className="text-center text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.4em]">
-            No Advance Payment Required for Booking
+            {settings.labelNoAdvance}
           </p>
         </div>
       </div>
@@ -197,19 +232,18 @@ function VehicleDetailsPage({ onBook }: { onBook: (vehicleName: string) => void 
   );
 }
 
-function HomePage({ onVehicleSelect, onBulkInquiry }: { onVehicleSelect: (vehicleName: string) => void, onBulkInquiry: () => void }) {
+function HomePage({ onVehicleSelect, onBulkInquiry, onPackageSelect, onCustomInquiry }: { onVehicleSelect: (id: string, name: string) => void, onBulkInquiry: () => void, onPackageSelect: (pkgName: string) => void, onCustomInquiry: () => void }) {
   const navigate = useNavigate();
   return (
     <>
       <Hero />
-      <Fleet onVehicleSelect={(name) => {
-        const vehicle = VEHICLES.find(v => v.name === name);
-        if (vehicle) navigate(`/vehicle/${vehicle.id}`);
+      <Fleet onVehicleSelect={(id) => {
+        navigate(`/vehicle/${id}`);
       }} onBulkInquiry={onBulkInquiry} />
-      <Rates />
+      <Rates onCustomInquiry={onCustomInquiry} />
       <Features />
       <Drivers />
-      <Packages />
+      <Packages onPackageSelect={onPackageSelect} />
       <Testimonials />
       <TravelGuide />
     </>
@@ -226,8 +260,8 @@ function AppContent() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  const handleVehicleSelect = (vehicleName: string) => {
-    setModalData({ vehicles: [vehicleName], isBulk: false });
+  const handleVehicleSelect = (id: string, name: string) => {
+    setModalData({ vehicles: [name], isBulk: false });
     setIsModalOpen(true);
   };
 
@@ -236,18 +270,29 @@ function AppContent() {
     setIsModalOpen(true);
   };
 
+  const handlePackageSelect = (packageName: string) => {
+    setModalData({ serviceType: 'package', packageName, isBulk: false });
+    setIsModalOpen(true);
+  };
+
+  const handleCustomInquiry = () => {
+    setModalData({ isCustom: true });
+    setIsModalOpen(true);
+  };
+
   return (
-    <div className={`min-h-screen font-sans selection:bg-yellow-200 selection:text-black transition-colors duration-500 ${theme === 'dark' ? 'dark bg-hotstar-bg text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen flex flex-col font-sans selection:bg-yellow-200 selection:text-black transition-colors duration-500 ${theme === 'dark' ? 'dark bg-hotstar-bg text-white' : 'bg-white text-gray-900'}`}>
       <Navbar 
         onDashboardClick={() => navigate('/dashboard')} 
         onHomeClick={() => navigate('/')} 
         theme={theme}
         toggleTheme={toggleTheme}
       />
-      <main>
+      <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<HomePage onVehicleSelect={handleVehicleSelect} onBulkInquiry={handleBulkInquiry} />} />
+          <Route path="/" element={<HomePage onVehicleSelect={handleVehicleSelect} onBulkInquiry={handleBulkInquiry} onPackageSelect={handlePackageSelect} onCustomInquiry={handleCustomInquiry} />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/vehicle/:id" element={<VehicleDetailsPage onBook={handleVehicleSelect} />} />
         </Routes>
       </main>
@@ -266,9 +311,11 @@ export default function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <HashRouter>
-          <AppContent />
-        </HashRouter>
+        <SiteProvider>
+          <HashRouter>
+            <AppContent />
+          </HashRouter>
+        </SiteProvider>
       </LanguageProvider>
     </AuthProvider>
   );

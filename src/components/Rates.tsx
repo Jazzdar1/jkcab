@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, ArrowRight, Car } from 'lucide-react';
-import { ROUTE_RATES } from '../constants';
+import { ROUTE_RATES as FALLBACK_RATES } from '../constants';
 import { useLanguage } from '../context/LanguageContext';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { useSite } from '../context/SiteContext';
 
-export default function Rates() {
+interface RatesProps {
+  onCustomInquiry?: () => void;
+}
+
+export default function Rates({ onCustomInquiry }: RatesProps) {
   const { t } = useLanguage();
+  const { settings } = useSite();
+  const [rates, setRates] = useState<any[]>([]);
+
+  useEffect(() => {
+    const q = query(collection(db, 'rates'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setRates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Error fetching rates:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <section id="rates" className="py-24 bg-gray-50 overflow-hidden">
@@ -16,8 +36,8 @@ export default function Rates() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-sm font-black text-yellow-600 uppercase tracking-[0.2em] mb-4">{t('rates.title')}</h2>
-            <h3 className="text-4xl font-black text-gray-900 mb-6">{t('rates.subtitle')}</h3>
+            <h2 className="text-sm font-black text-yellow-600 uppercase tracking-[0.2em] mb-4">{settings.ratesSectionLabel}</h2>
+            <h3 className="text-4xl font-black text-gray-900 mb-6">{settings.ratesSubtitle}</h3>
             <div className="w-24 h-1 bg-yellow-400 mx-auto rounded-full"></div>
           </motion.div>
         </div>
@@ -44,9 +64,9 @@ export default function Rates() {
             </div>
 
             <div className="divide-y divide-gray-100">
-              {ROUTE_RATES.map((rate, index) => (
+              {rates.map((rate, index) => (
                 <motion.div
-                  key={index}
+                  key={rate.id || index}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -62,12 +82,12 @@ export default function Rates() {
                   
                   <div className="flex items-center justify-between md:justify-end md:space-x-12">
                     <div className="text-right">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Sedan</div>
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{settings.labelSedan}</div>
                       <div className="text-xl font-black text-black">{rate.sedan}</div>
                     </div>
                     <div className="w-px h-10 bg-gray-100 hidden md:block"></div>
                     <div className="text-right">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">SUV</div>
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{settings.labelSuv}</div>
                       <div className="text-xl font-black text-yellow-600">{rate.suv}</div>
                     </div>
                   </div>
@@ -79,7 +99,10 @@ export default function Rates() {
               <p className="text-black font-bold text-sm mb-4">
                 * Prices are subject to change during peak season. All tolls and parking extra as applicable.
               </p>
-              <button className="bg-black text-white px-10 py-4 rounded-2xl font-bold hover:bg-gray-900 transition-all shadow-xl flex items-center mx-auto group">
+              <button 
+                onClick={onCustomInquiry}
+                className="bg-black text-white px-10 py-4 rounded-2xl font-bold hover:bg-gray-900 transition-all shadow-xl flex items-center mx-auto group"
+              >
                 Check Custom Route Price
                 <ArrowRight className="h-5 w-5 ml-3 group-hover:translate-x-1 transition-transform" />
               </button>

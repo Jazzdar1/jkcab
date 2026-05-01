@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Menu, X, Phone, Car, LayoutDashboard, LogIn, User as UserIcon, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Phone, Car, LayoutDashboard, LogIn, User as UserIcon, Globe, ChevronDown, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CONTACT_INFO } from '../constants';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { signInWithGoogle } from '../lib/firebase';
 import Logo from './Logo';
+import { useSite } from '../context/SiteContext';
 
 interface NavbarProps {
   onDashboardClick: () => void;
@@ -18,8 +19,9 @@ interface NavbarProps {
 export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleTheme }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const { settings } = useSite();
   const [showLangMenu, setShowLangMenu] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,11 +39,11 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
   }, []);
 
   const navLinks = [
-    { name: t('nav.home'), href: '/', isHash: false },
-    { name: t('nav.fleet'), href: '/#fleet', isHash: true },
-    { name: t('nav.drivers'), href: '/#drivers', isHash: true },
-    { name: t('nav.rates'), href: '/#rates', isHash: true },
-    { name: t('nav.packages'), href: '/#packages', isHash: true },
+    { name: settings.navHome, href: '/', isHash: false },
+    { name: settings.navFleet, href: '/#fleet', isHash: true },
+    { name: settings.navDrivers, href: '/#drivers', isHash: true },
+    { name: settings.navRates, href: '/#rates', isHash: true },
+    { name: settings.navPackages, href: '/#tourpackages', isHash: true },
   ];
 
   const handleLinkClick = (e: React.MouseEvent, link: { href: string, isHash: boolean }) => {
@@ -151,33 +153,54 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
               {loading ? (
                 <div className="h-10 w-40 rounded-2xl bg-gray-100 animate-pulse"></div>
               ) : user ? (
-                <button
-                  onClick={onDashboardClick}
-                  className={`flex items-center px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    isDashboard 
-                      ? 'bg-black text-white' 
-                      : 'bg-white text-black border border-gray-100 hover:border-yellow-400 hover:shadow-xl hover:shadow-yellow-400/10'
-                  }`}
-                >
-                  <LayoutDashboard className="h-3.5 w-3.5 mr-2" />
-                  {t('nav.dashboard')}
-                </button>
+                <div className="flex items-center space-x-2">
+                  {isAdmin && (
+                    <button
+                      onClick={() => navigate('/admin')}
+                      className={`flex items-center px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                        location.pathname === '/admin'
+                          ? 'bg-red-500 text-white'
+                          : 'bg-white text-red-500 border border-red-100 hover:bg-red-50'
+                      }`}
+                    >
+                      <Settings className="h-3.5 w-3.5 mr-2" />
+                      Admin
+                    </button>
+                  )}
+                  <button
+                    onClick={onDashboardClick}
+                    className={`flex items-center px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      isDashboard 
+                        ? 'bg-black text-white' 
+                        : 'bg-white text-black border border-gray-100 hover:border-yellow-400 hover:shadow-xl hover:shadow-yellow-400/10'
+                    }`}
+                  >
+                    <LayoutDashboard className="h-3.5 w-3.5 mr-2" />
+                    {settings.navDashboard}
+                  </button>
+                </div>
               ) : (
                 <button
-                  onClick={() => signInWithGoogle()}
-                  className="flex items-center bg-white/10 backdrop-blur-md text-white border border-white/20 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all shadow-xl"
+                  onClick={async () => {
+                    try {
+                      await signInWithGoogle();
+                    } catch (error) {
+                      // Error is handled in lib/firebase.ts
+                    }
+                  }}
+                  className="flex items-center bg-yellow-400 text-black px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:shadow-2xl hover:shadow-yellow-400/20 transition-all shadow-xl group/login"
                 >
-                  <LogIn className="h-3.5 w-3.5 mr-2" />
-                  {t('nav.signIn')}
+                  <LogIn className="h-3.5 w-3.5 mr-2 group-hover/login:scale-110 transition-transform" />
+                  {settings.navSignIn}
                 </button>
               )}
               
               <a
-                href={`tel:${CONTACT_INFO.phone}`}
+                href={`tel:${settings.contactPhone}`}
                 className="flex items-center bg-yellow-400 text-black px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 shadow-xl shadow-yellow-400/30 border-2 border-white"
               >
                 <Phone className="h-3.5 w-3.5 mr-2" />
-                {t('nav.callNow')}
+                {settings.navCallNow}
               </a>
             </div>
           </div>
@@ -212,9 +235,21 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
           >
             <div className="flex justify-between items-center mb-12">
                <Logo scrolled={true} />
-               <button onClick={() => setIsOpen(false)}>
-                  <X className="h-8 w-8 text-gray-900 dark:text-white" />
-               </button>
+               <div className="flex items-center space-x-4">
+                  <button
+                    onClick={toggleTheme}
+                    className="p-3 rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                  >
+                    {theme === 'dark' ? (
+                      <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" /></svg>
+                    ) : (
+                      <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
+                    )}
+                  </button>
+                  <button onClick={() => setIsOpen(false)}>
+                     <X className="h-8 w-8 text-gray-900 dark:text-white" />
+                  </button>
+               </div>
             </div>
 
             <div className="space-y-6 flex-1 overflow-y-auto">
@@ -230,34 +265,49 @@ export default function Navbar({ onDashboardClick, onHomeClick, theme, toggleThe
               ))}
               
               {user ? (
-                <button
-                  onClick={() => { navigate('/dashboard'); setIsOpen(false); }}
-                  className="flex items-center w-full p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-xl font-bold text-gray-900 dark:text-white"
-                >
-                  <LayoutDashboard className="h-6 w-6 mr-4 text-yellow-500" />
-                  {t('nav.dashboard')}
-                </button>
+                <div className="space-y-4">
+                  {isAdmin && (
+                    <button
+                      onClick={() => { navigate('/admin'); setIsOpen(false); }}
+                      className="flex items-center w-full p-4 bg-red-50 dark:bg-red-500/10 rounded-2xl text-xl font-bold text-red-600"
+                    >
+                      <Settings className="h-6 w-6 mr-4" />
+                      Admin Panel
+                    </button>
+                  )}
+                  <button
+                    onClick={() => { navigate('/dashboard'); setIsOpen(false); }}
+                    className="flex items-center w-full p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-xl font-bold text-gray-900 dark:text-white"
+                  >
+                    <LayoutDashboard className="h-6 w-6 mr-4 text-yellow-500" />
+                    {settings.navDashboard}
+                  </button>
+                </div>
               ) : (
                 <button
-                  onClick={() => {
-                    signInWithGoogle();
-                    setIsOpen(false);
+                  onClick={async () => {
+                    try {
+                      await signInWithGoogle();
+                      setIsOpen(false);
+                    } catch (error) {
+                      // Error is handled in lib/firebase.ts
+                    }
                   }}
                   className="flex items-center w-full p-4 bg-yellow-400 rounded-2xl text-xl font-bold text-black"
                 >
                   <LogIn className="h-6 w-6 mr-4" />
-                  {t('nav.signIn')}
+                  {settings.navSignIn}
                 </button>
               )}
             </div>
 
             <div className="pt-8 border-t border-gray-100 dark:border-white/10">
                 <a
-                  href={`tel:${CONTACT_INFO.phone}`}
+                  href={`tel:${settings.contactPhone}`}
                   className="w-full flex items-center justify-center bg-black dark:bg-white dark:text-black text-white px-6 py-5 rounded-2xl text-xl font-bold shadow-2xl shadow-black/20"
                 >
                   <Phone className="h-6 w-6 mr-3" />
-                  {t('nav.callNow')}
+                  {settings.navCallNow}
                 </a>
             </div>
           </motion.div>

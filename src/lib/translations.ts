@@ -27,6 +27,7 @@ export const translations = {
     },
     booking: {
       title: 'Quick Booking',
+      customTitle: 'Custom Route Inquiry',
       name: 'Full Name',
       phone: 'Phone',
       pickup: 'Pickup Location',
@@ -116,6 +117,7 @@ export const translations = {
     },
     booking: {
       title: 'त्वरित बुकिंग',
+      customTitle: 'कस्टम मार्ग पूछताछ',
       name: 'पूरा नाम',
       phone: 'फ़ोन',
       pickup: 'पिकअप स्थान',

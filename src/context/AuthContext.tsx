@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!userDoc.exists()) {
           const newProfile = {
             email: user.email,
-            name: user.displayName,
+            name: user.displayName || 'Customer',
             role: 'customer',
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),

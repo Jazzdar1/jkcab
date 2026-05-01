@@ -1,28 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, Info, LayoutGrid, ListFilter, Users, ArrowRight } from 'lucide-react';
-import { VEHICLES } from '../constants';
+import { VEHICLES as FALLBACK_VEHICLES } from '../constants';
 import { Vehicle } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { useSite } from '../context/SiteContext';
 
 interface FleetProps {
-  onVehicleSelect?: (vehicleName: string) => void;
+  onVehicleSelect?: (vehicleId: string, vehicleName: string) => void;
   onBulkInquiry?: () => void;
 }
 
 export default function Fleet({ onVehicleSelect, onBulkInquiry }: FleetProps) {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [filter, setFilter] = useState<Vehicle['type'] | 'All'>('All');
   const { t } = useLanguage();
+  const { settings } = useSite();
 
-  const handleVehicleClick = (vehicleName: string) => {
+  useEffect(() => {
+    const q = query(collection(db, 'fleet'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedVehicles = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Vehicle[];
+      setVehicles(fetchedVehicles);
+    }, (error) => {
+      console.error("Error fetching fleet:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleVehicleClick = (id: string, name: string) => {
     if (onVehicleSelect) {
-      onVehicleSelect(vehicleName);
+      onVehicleSelect(id, name);
     }
   };
 
   const filteredVehicles = filter === 'All' 
-    ? VEHICLES 
-    : VEHICLES.filter(v => v.type === filter);
+    ? vehicles 
+    : vehicles.filter(v => v.type === filter);
 
   const categories: (Vehicle['type'] | 'All')[] = ['All', 'Sedan', 'SUV', 'Luxury', 'Large Group'];
 
@@ -37,10 +57,10 @@ export default function Fleet({ onVehicleSelect, onBulkInquiry }: FleetProps) {
           >
             <div className="flex items-center justify-center space-x-3 mb-6">
               <div className="h-[2px] w-8 bg-yellow-400"></div>
-              <span className="text-yellow-600 text-[10px] font-black uppercase tracking-[0.4em] font-sans">{t('fleet.title')}</span>
+              <span className="text-yellow-600 text-[10px] font-black uppercase tracking-[0.4em] font-sans">{settings.fleetSectionLabel}</span>
               <div className="h-[2px] w-8 bg-yellow-400"></div>
             </div>
-            <h3 className="text-5xl font-black text-gray-900 mb-8 tracking-tighter font-display">{t('fleet.subtitle')}</h3>
+            <h3 className="text-5xl font-black text-gray-900 mb-8 tracking-tighter font-display">{settings.fleetSubtitle}</h3>
           </motion.div>
 
           {/* Filter Controls */}
@@ -74,7 +94,7 @@ export default function Fleet({ onVehicleSelect, onBulkInquiry }: FleetProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.4 }}
-                onClick={() => handleVehicleClick(vehicle.name)}
+                onClick={() => handleVehicleClick(vehicle.id, vehicle.name)}
                 className="bg-[#fafafa] rounded-[2.5rem] overflow-hidden hover:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.1)] transition-all duration-500 border border-gray-100 flex flex-col h-full group cursor-pointer"
               >
                 <div className="h-64 overflow-hidden relative group">
@@ -139,13 +159,13 @@ export default function Fleet({ onVehicleSelect, onBulkInquiry }: FleetProps) {
 
                   <div className="pt-6 border-t border-gray-200 mt-auto flex justify-between items-center">
                     <div>
-                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Per Day Rate</div>
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{settings.labelPerDay}</div>
                       <div className="text-2xl font-black text-black group-hover:text-yellow-600 transition-colors">{vehicle.pricePerDay}</div>
                     </div>
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleVehicleClick(vehicle.name);
+                        handleVehicleClick(vehicle.id, vehicle.name);
                       }}
                       className="bg-white text-black p-4 rounded-2xl border border-gray-100 hover:bg-yellow-400 hover:border-yellow-400 transition-all shadow-sm active:scale-95 group-hover:shadow-xl group-hover:shadow-yellow-400/20"
                     >
@@ -161,16 +181,16 @@ export default function Fleet({ onVehicleSelect, onBulkInquiry }: FleetProps) {
         <div className="mt-20 bg-black rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center justify-between shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400/10 rounded-full -mr-32 -mt-32"></div>
           <div className="relative z-10">
-            <h5 className="text-2xl font-bold text-white mb-2">Need a custom fleet for an event?</h5>
+            <h5 className="text-2xl font-bold text-white mb-2">{settings.customFleetTitle}</h5>
             <p className="text-gray-400 font-medium max-w-xl">
-              We provide bulk bookings for weddings, corporate events, and large group tours across Jammu & Kashmir.
+              {settings.customFleetDesc}
             </p>
           </div>
           <button 
             onClick={onBulkInquiry}
             className="mt-8 md:mt-0 bg-yellow-400 text-black px-10 py-4 rounded-2xl font-bold hover:bg-white transition-all whitespace-nowrap shadow-xl relative z-10"
           >
-            Bulk Inquiry
+            {settings.customFleetButton}
           </button>
         </div>
       </div>

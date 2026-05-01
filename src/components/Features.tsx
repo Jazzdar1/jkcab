@@ -1,30 +1,16 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ShieldCheck, Clock, ShieldAlert, Award, Star, ThumbsUp } from 'lucide-react';
+import { useSite } from '../context/SiteContext';
 
 export default function Features() {
-  const highlights = [
-    {
-      icon: ShieldCheck,
-      title: 'Reliable Service',
-      desc: 'We pride ourselves on punctuality and high safety standards for every client.'
-    },
-    {
-      icon: ShieldAlert,
-      title: 'No Hidden Costs',
-      desc: 'Transparant pricing from the start. What we quote is what you pay.'
-    },
-    {
-      icon: Award,
-      title: 'Local Experts',
-      desc: 'Our drivers are born and raised in Kashmir, knowing every hidden gem.'
-    },
-    {
-      icon: Clock,
-      title: 'Real-time Tracking',
-      desc: 'Stay informed with live driver tracking and instant WhatsApp updates for every trip.'
-    }
-  ];
+  const { settings } = useSite();
+  const highlightIcons = [ShieldCheck, ShieldAlert, Award, Clock];
+  
+  const highlights = settings.highlights.map((h, i) => ({
+    ...h,
+    icon: highlightIcons[i] || ShieldCheck
+  }));
 
   return (
     <section className="py-32 bg-[#050505] overflow-hidden">
@@ -39,12 +25,12 @@ export default function Features() {
           >
             <div className="flex items-center space-x-3 mb-8">
               <div className="h-[2px] w-12 bg-yellow-400"></div>
-              <span className="text-yellow-400 text-xs font-black uppercase tracking-[0.4em] font-sans">Why J&K CABS?</span>
+              <span className="text-yellow-400 text-xs font-black uppercase tracking-[0.4em] font-sans">{settings.featuresSectionLabel}</span>
             </div>
             
             <h3 className="text-5xl md:text-7xl font-black text-white mb-16 tracking-tighter font-display leading-[0.95]">
-              A Service Built on <br />
-              <span className="text-yellow-400 opacity-50 italic">Trust & Experience</span>
+              {settings.featuresTitle} <br />
+              <span className="text-yellow-400 opacity-50 italic">{settings.featuresSubtitle}</span>
             </h3>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-16">

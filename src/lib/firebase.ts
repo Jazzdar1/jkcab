@@ -20,8 +20,33 @@ export const db = getFirestore(app, config.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Custom sign-in function using popup
-export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+// Custom sign-in function using popup with locking and error handling
+let isSigningIn = false;
+
+export const signInWithGoogle = async () => {
+  if (isSigningIn) {
+    console.warn('Sign-in already in progress');
+    return;
+  }
+  
+  isSigningIn = true;
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result;
+  } catch (error: any) {
+    // Handle common Firebase Auth errors
+    if (error.code === 'auth/popup-closed-by-user') {
+      console.log('User closed the sign-in popup');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      console.log('Sign-in popup request was cancelled');
+    } else {
+      console.error('Firebase Auth Error:', error.message);
+    }
+    throw error;
+  } finally {
+    isSigningIn = false;
+  }
+};
 
 // Custom sign-out function
 export const logOut = () => signOut(auth);

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Car, Mountain } from 'lucide-react';
+import { useSite } from '../context/SiteContext';
 
 interface LogoProps {
   scrolled?: boolean;
@@ -7,6 +8,7 @@ interface LogoProps {
 }
 
 export default function Logo({ scrolled, className = "" }: LogoProps) {
+  const { settings } = useSite();
   return (
     <div className={`flex items-center space-x-3 group cursor-pointer ${className}`}>
       <div className="relative">
@@ -19,13 +21,13 @@ export default function Logo({ scrolled, className = "" }: LogoProps) {
       <div className="flex flex-col">
         <div className="flex items-center">
           <span className={`text-2xl font-black tracking-tighter leading-none transition-colors duration-300 font-display ${scrolled ? 'text-black dark:text-white' : 'text-white'}`}>
-            J&K<span className="text-yellow-400 font-black">CABS</span>
+            {settings.logoLine1}<span className="text-yellow-400 font-black">{settings.logoLine2}</span>
           </span>
         </div>
         <div className="flex items-center space-x-1 mt-0.5">
           <div className="h-[1.5px] w-4 bg-yellow-400"></div>
           <span className={`text-[9px] font-black uppercase tracking-[0.4em] transition-colors duration-300 font-sans ${scrolled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-300'} opacity-100`}>
-            EST. 2010
+            {settings.logoTagline}
           </span>
         </div>
       </div>

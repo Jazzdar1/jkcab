@@ -383,6 +383,15 @@ export default function Dashboard() {
                                <Phone className="h-5 w-5 mr-3" />
                                {t('dashboard.support')}
                              </button>
+                             {booking.status === 'pending' && (
+                               <button 
+                                 onClick={() => updateStatus(booking.id, 'cancelled')}
+                                 className="px-8 py-4 bg-red-50 text-red-500 rounded-[1.5rem] text-sm font-black flex items-center hover:bg-red-100 transition-all active:scale-95 border border-red-100"
+                               >
+                                 <XCircle className="h-5 w-5 mr-3" />
+                                 Cancel Trip
+                               </button>
+                             )}
                            </div>
                          )}
                       </div>

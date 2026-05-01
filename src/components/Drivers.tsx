@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Star, ShieldCheck, Languages, Award } from 'lucide-react';
-import { DRIVERS } from '../constants';
+import { DRIVERS as FALLBACK_DRIVERS } from '../constants';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 
 export default function Drivers() {
+  const [drivers, setDrivers] = useState<any[]>([]);
+
+  useEffect(() => {
+    const q = query(collection(db, 'drivers'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setDrivers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Error fetching drivers:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <section id="drivers" className="py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,9 +38,9 @@ export default function Drivers() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {DRIVERS.map((driver, index) => (
+          {drivers.map((driver, index) => (
             <motion.div
-              key={driver.id}
+              key={driver.id || index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
