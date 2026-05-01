@@ -22,13 +22,18 @@ export default function Fleet({ onVehicleSelect, onBulkInquiry }: FleetProps) {
   useEffect(() => {
     const q = query(collection(db, 'fleet'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedVehicles = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Vehicle[];
-      setVehicles(fetchedVehicles);
+      if (snapshot.empty) {
+        setVehicles(FALLBACK_VEHICLES);
+      } else {
+        const fetchedVehicles = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Vehicle[];
+        setVehicles(fetchedVehicles);
+      }
     }, (error) => {
       console.error("Error fetching fleet:", error);
+      setVehicles(FALLBACK_VEHICLES);
     });
 
     return () => unsubscribe();

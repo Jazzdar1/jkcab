@@ -18,15 +18,24 @@ export default function Packages({ onPackageSelect }: PackagesProps) {
   useEffect(() => {
     const q = query(collection(db, 'packages'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setPackages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      if (snapshot.empty) {
+        setPackages(FALLBACK_PACKAGES);
+      } else {
+        setPackages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }
     }, (error) => {
       console.error("Error fetching packages:", error);
+      setPackages(FALLBACK_PACKAGES);
     });
 
     return () => unsubscribe();
   }, []);
 
-  const gridCols = packages.length === 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3";
+  const gridCols = packages.length >= 4 
+    ? "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3" 
+    : packages.length === 2 
+    ? "sm:grid-cols-2" 
+    : "sm:grid-cols-2 lg:grid-cols-3";
 
   return (
     <section id="tourpackages" className="py-32 bg-[#fafafa]">

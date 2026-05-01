@@ -87,6 +87,33 @@ export const TOUR_PACKAGES: TourPackage[] = [
     image: 'https://images.unsplash.com/photo-1589133423730-48767e399cbf?auto=format&fit=crop&q=80&w=800',
     description: 'An immersive experience into the cinematic valleys and serene landscapes of Kashmir.',
   },
+  {
+    id: 'pkg-4',
+    title: 'Short & Sweet Kashmir',
+    duration: '3 Days / 2 Nights',
+    price: 'Starting from ₹9,500',
+    destinations: ['Srinagar', 'Gulmarg'],
+    image: 'https://images.unsplash.com/photo-1590050720499-aa495574503e?auto=format&fit=crop&q=80&w=800',
+    description: 'Perfect for a quick weekend getaway to the crown of India.',
+  },
+  {
+    id: 'pkg-5',
+    title: 'Paradise Odyssey',
+    duration: '8 Days / 7 Nights',
+    price: 'Starting from ₹28,500',
+    destinations: ['Srinagar', 'Gulmarg', 'Pahalgam', 'Sonamarg', 'Doodhpathri', 'Aru Valley'],
+    image: 'https://images.unsplash.com/photo-1594568284297-7c64464062b1?auto=format&fit=crop&q=80&w=800',
+    description: 'A complete traverse of the valley, including offbeat gems and hidden meadows.',
+  },
+  {
+    id: 'pkg-6',
+    title: 'Honeymoon Special',
+    duration: '7 Days / 6 Nights',
+    price: 'Starting from ₹24,000',
+    destinations: ['Srinagar (Houseboat)', 'Gulmarg', 'Pahalgam'],
+    image: 'https://images.unsplash.com/photo-1628108422476-80517724ec56?auto=format&fit=crop&q=80&w=800',
+    description: 'Curated for romance with candle-light stays and serene lake moments.',
+  },
 ];
 
 export const ROUTE_RATES = [

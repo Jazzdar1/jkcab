@@ -19,6 +19,7 @@ export const translations = {
       subtitle: 'Experience the magic of Paradise on Earth with Srinagar\'s most reliable local cab service. Guaranteed comfort and safety.',
       bookButton: 'Book Your Ride',
       fleetButton: 'View Fleet',
+      popularTours: 'Or Choose a Popular Tour',
       stats: {
         trips: 'Trips Completed',
         drivers: 'Expert Drivers',
@@ -109,6 +110,7 @@ export const translations = {
       subtitle: 'कश्मीर की सुंदरता का अनुभव श्रीनगर की सबसे भरोसेमंद स्थानीय कैब सेवा के साथ करें। सुखद और सुरक्षित यात्रा की गारंटी।',
       bookButton: 'अभी बुक करें',
       fleetButton: 'कारें देखें',
+      popularTours: 'या एक लोकप्रिय टूर चुनें',
       stats: {
         trips: 'यात्राएं पूरी हुईं',
         drivers: 'विशेषज्ञ ड्राइवर',

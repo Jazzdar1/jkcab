@@ -19,9 +19,14 @@ export default function Rates({ onCustomInquiry }: RatesProps) {
   useEffect(() => {
     const q = query(collection(db, 'rates'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setRates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      if (snapshot.empty) {
+        setRates(FALLBACK_RATES);
+      } else {
+        setRates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }
     }, (error) => {
       console.error("Error fetching rates:", error);
+      setRates(FALLBACK_RATES);
     });
 
     return () => unsubscribe();
