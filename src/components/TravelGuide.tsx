@@ -5,7 +5,7 @@ import { Plus, Minus, HelpCircle } from 'lucide-react';
 const faqs = [
   {
     q: 'How do I book a cab in Srinagar?',
-    a: 'You can book directly via our website by filling the inquiry form or by calling/messaging us on WhatsApp at +91 9149820828.'
+    a: 'You can book directly via our website by filling the inquiry form or by calling/messaging us on WhatsApp at +91 7006268328 7889916633.'
   },
   {
     q: 'Are your rates fixed or negotiable?',
